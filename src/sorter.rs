@@ -73,4 +73,4 @@ pub fn get_klausur_lines_data(file_number: u8) -> HashMap<u8, String> {
     }
     klausuren_data
 }
-pub fn 
+pub fn sort_data() {}
