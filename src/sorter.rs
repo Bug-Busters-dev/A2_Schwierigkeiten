@@ -40,22 +40,27 @@ pub fn sorter(file_number: u8) {
                     for (key1, val1) in hash_vec[j].clone().iter() {
                         for (key2, val2) in hash_vec[k].clone().iter() {
                             if key1 == key2 {
-                                println!("Found matching key: {}", key1);
                                 if val1 > val2 {
-                                    hash_vec[k]
-                                        .entry(*key2)
-                                        .and_modify(|v| *v += 1)
-                                        .or_insert(val2 + 1);
-                                    println!("{:?}", hash_vec[k]);
+                                    let diff = val1 - val2;
+                                    hash_vec[k].insert(*key2, *val1);
+                                    for (_, val) in hash_vec[k].iter_mut() {
+                                        if *val > *val2 {
+                                            *val += diff;
+                                        }
+                                    }
                                 } else if val2 > val1 {
-                                    hash_vec[j]
-                                        .entry(*key1)
-                                        .and_modify(|v| *v += 1)
-                                        .or_insert(val1 + 1);
-                                    println!("{:?}", hash_vec[j]);
-                                } else {
-                                    continue;
+                                    let diff = val2 - val1;
+                                    hash_vec[j].insert(*key1, *val2);
+
+                                    // Adjust other values greater than the old smaller value
+                                    for (_, val) in hash_vec[j].iter_mut() {
+                                        if *val > *val1 {
+                                            *val += diff;
+                                        }
+                                    }
                                 }
+                            } else {
+                                continue;
                             }
                         }
                     }
@@ -63,4 +68,5 @@ pub fn sorter(file_number: u8) {
             }
         }
     }
+    println!("{:?}", hash_vec);
 }
