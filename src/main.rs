@@ -1,10 +1,11 @@
 use std::io::{self, Read};
 pub mod reader;
 pub mod sorter;
+pub mod sorter_new;
 pub mod sorter_util;
 const PATH: &str = "./data/schwierigkeiten0.txt";
 fn main() {
-    sorter::sorter(0);
+    sorter_new::sorter(0);
     end();
 }
 

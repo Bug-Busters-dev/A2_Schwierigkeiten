@@ -30,37 +30,48 @@ pub fn sorter(file_number: u8) {
         }
     }
 
-    for (i, hashmap) in hash_vec.clone().iter().enumerate() {
+    'hashmaps: for (i, hashmap) in hash_vec.clone().iter().enumerate() {
         println!("Hashmap for Klausur {}: {:?}", i, hashmap);
 
         // Check for duplicate keys across all hashmaps
+
         for j in 0..hash_vec.len() {
             for k in 0..hash_vec.len() {
                 if j != k {
                     for (key1, val1) in hash_vec[j].clone().iter() {
-                        for (key2, val2) in hash_vec[k].clone().iter() {
+                        'keys: for (key2, val2) in hash_vec[k].clone().iter() {
                             if key1 == key2 {
                                 if val1 > val2 {
                                     let diff = val1 - val2;
-                                    hash_vec[k].insert(*key2, *val1);
-                                    for (_, val) in hash_vec[k].iter_mut() {
+                                    hash_vec[k].entry(*key2).or_insert(*val1);
+
+                                    // adjjust other values
+                                    'value_bigger: for (_, val) in hash_vec[k].iter_mut() {
                                         if *val > *val2 {
                                             *val += diff;
+                                        } else {
+                                            continue 'value_bigger;
                                         }
                                     }
                                 } else if val2 > val1 {
                                     let diff = val2 - val1;
-                                    hash_vec[j].insert(*key1, *val2);
+                                    hash_vec[k].entry(*key1).or_insert(*val2);
 
                                     // Adjust other values greater than the old smaller value
-                                    for (_, val) in hash_vec[j].iter_mut() {
+                                    'values_smaller: for (_, val) in hash_vec[j].iter_mut() {
+                                        if *val == *val2 {
+                                            continue 'values_smaller;
+                                        }
+
                                         if *val > *val1 {
                                             *val += diff;
+                                        } else {
+                                            continue 'values_smaller;
                                         }
                                     }
                                 }
                             } else {
-                                continue;
+                                continue 'keys;
                             }
                         }
                     }
@@ -68,5 +79,5 @@ pub fn sorter(file_number: u8) {
             }
         }
     }
-    println!("{:?}", hash_vec);
+    println!("{:?}", hash_vec)
 }
