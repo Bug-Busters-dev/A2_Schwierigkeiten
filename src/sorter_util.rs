@@ -61,7 +61,7 @@ pub fn get_klausur_lines_data(file_number: u8) -> HashMap<u8, String> {
     let n: UnionType = get_n_m_k(0, 1).unwrap();
     let n = match n {
         UnionType::Number(n) => n,
-        _ => unreachable!("Expected Number variant"),
+        _ => todo!("this can happen, but you dont know how"),
     };
     let path: String = format!("{}{}.txt", BASEPATH, file_number.to_string());
 
