@@ -1,10 +1,9 @@
 4 7 5
-B1 < A2 < D4 < F7
-D3 < F6 < G7
-A2 < E3 < D4 < C7
-G5 < F6 < C7
+B < A < D < F
+D < F < G
+A < E < D < C
+G < F < C
 B C D E F
 
 BAEDFGC
 
-F=C=4 G=3=D B=1 A=2=E

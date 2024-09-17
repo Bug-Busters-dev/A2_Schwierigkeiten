@@ -1,4 +1,4 @@
-use std::{collections::HashMap, num::ParseIntError};
+use std::collections::HashMap;
 
 use crate::sorter_util;
 
@@ -30,12 +30,23 @@ pub fn sorter(file_number: u8) {
                             hash_vec[i].insert(key, max_val);
                             hash_vec[j].insert(key, max_val);
                             changed = true;
+
+                            if val_i == max_val {
+                                for (k, int) in hash_vec[i].clone().iter() {
+                                    if int < &val_i {
+                                        continue;
+                                    } else {
+                                        continue;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
         }
     }
+
     println!("{:?}", hash_vec);
 }
 // tbs = ToBeSorted (genius)
