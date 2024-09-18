@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt::Error};
 
 use crate::sorter_util;
 
@@ -34,9 +34,16 @@ pub fn sorter(file_number: u8) {
                             if val_i == max_val {
                                 for (k, int) in hash_vec[i].clone().iter() {
                                     if int < &val_i {
-                                        continue;
+                                        let diff = max_val - val_i;
+                                        hash_vec[i].clone().entry(*k).or_insert({
+                                            let v = hash_vec[i].get(k);
+                                            match v {
+                                                Option::Some(v) => *v,
+                                                Option::None => todo!("tried to index invalid key"),
+                                            };
+                                            v + diff
+                                        });
                                     } else {
-                                        continue;
                                     }
                                 }
                             }
