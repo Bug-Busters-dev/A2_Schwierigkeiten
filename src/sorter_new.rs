@@ -30,20 +30,31 @@ pub fn sorter(file_number: u8) {
                             hash_vec[i].insert(key, max_val);
                             hash_vec[j].insert(key, max_val);
                             changed = true;
-
+                            println!("hasmap when inserting {:?}", hash_vec);
                             if val_i == max_val {
-                                for (k, int) in hash_vec[i].clone().iter() {
-                                    if int < &val_i {
+                                for (k, int) in hash_vec[i].iter_mut() {
+                                    if *int < val_i {
                                         let diff = max_val - val_i;
-                                        hash_vec[i].clone().entry(*k).or_insert({
-                                            let v = hash_vec[i].get(k);
-                                            match v {
-                                                Option::Some(v) => *v,
-                                                Option::None => todo!("tried to index invalid key"),
-                                            };
-                                            v + diff
-                                        });
+                                        if diff < 1 {
+                                            *int += diff;
+                                        } else {
+                                            continue;
+                                        }
                                     } else {
+                                        continue;
+                                    }
+                                }
+                            } else if val_j == max_val {
+                                for (k, int) in hash_vec[j].iter_mut() {
+                                    if *int < val_j {
+                                        let diff = max_val - val_j;
+                                        if diff > 1 {
+                                            *int += diff;
+                                        } else {
+                                            continue;
+                                        }
+                                    } else {
+                                        continue;
                                     }
                                 }
                             }
@@ -53,7 +64,6 @@ pub fn sorter(file_number: u8) {
             }
         }
     }
-
     println!("{:?}", hash_vec);
 }
 // tbs = ToBeSorted (genius)
