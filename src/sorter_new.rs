@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fmt::Error};
+use std::{collections::HashMap, i16};
 
 use crate::sorter_util;
 
@@ -10,11 +10,11 @@ pub fn sorter(file_number: u8) {
         *klausur = klausur.replace(" < ", "");
     }
 
-    let mut hash_vec: Vec<HashMap<char, u16>> = vec![HashMap::new(); klausuren_vec.len()];
+    let mut hash_vec: Vec<HashMap<char, i16>> = vec![HashMap::new(); klausuren_vec.len()];
 
     for (i, klausur) in klausuren_vec.iter().enumerate() {
         for (j, char) in klausur.chars().enumerate() {
-            hash_vec[i].insert(char, (j + 1) as u16);
+            hash_vec[i].insert(char, (j + 1) as i16);
         }
     }
 
@@ -22,37 +22,28 @@ pub fn sorter(file_number: u8) {
     while changed {
         changed = false;
         for i in 0..hash_vec.len() {
-            for j in (i + 1)..hash_vec.len() {
+            for j in 0..hash_vec.len() {
                 for (&key, &val_i) in hash_vec[i].clone().iter() {
                     if let Some(&val_j) = hash_vec[j].get(&key) {
                         if val_i != val_j {
-                            let max_val = val_i.max(val_j);
+                            let max_val: i16 = val_i.max(val_j);
                             hash_vec[i].insert(key, max_val);
                             hash_vec[j].insert(key, max_val);
                             changed = true;
-                            println!("hasmap when inserting {:?}", hash_vec);
                             if val_i == max_val {
-                                for (k, int) in hash_vec[i].iter_mut() {
-                                    if *int < val_i {
-                                        let diff = max_val - val_i;
-                                        if diff < 1 {
-                                            *int += diff;
-                                        } else {
-                                            continue;
-                                        }
+                                for (_, int) in hash_vec[i].iter_mut() {
+                                    let diff: i16 = *int - max_val;
+                                    if !diff < 1 {
+                                        *int = diff + 1;
                                     } else {
                                         continue;
                                     }
                                 }
                             } else if val_j == max_val {
-                                for (k, int) in hash_vec[j].iter_mut() {
-                                    if *int < val_j {
-                                        let diff = max_val - val_j;
-                                        if diff > 1 {
-                                            *int += diff;
-                                        } else {
-                                            continue;
-                                        }
+                                for (_, int) in hash_vec[j].iter_mut() {
+                                    let diff = *int - max_val;
+                                    if !diff < 1 {
+                                        *int = diff + 1;
                                     } else {
                                         continue;
                                     }
@@ -67,4 +58,4 @@ pub fn sorter(file_number: u8) {
     println!("{:?}", hash_vec);
 }
 // tbs = ToBeSorted (genius)
-pub fn process_sorted(tbs: &mut Vec<HashMap<char, u16>>) {}
+pub fn process_sorted(_tbs: &mut Vec<HashMap<char, u16>>) {}

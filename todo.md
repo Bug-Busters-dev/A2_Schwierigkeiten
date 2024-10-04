@@ -12,3 +12,7 @@
 - [ ] read caracters in lines
 - [ ] process these carracters
 - [ ] output sorted klausuren list
+
+
+
+neue implemetaion für line 35 
