@@ -36,8 +36,7 @@ impl From<String> for SorterError {
     }
 }
 
-pub fn get_n_m_k(file_number: u8, returntype: u8) -> Result<UnionType, SorterError> {
-    let path: String = format!("{}{}.txt", BASEPATH, file_number.to_string());
+pub fn get_n_m_k(path: &String, returntype: u8) -> Result<UnionType, SorterError> {
     let characters: Result<Vec<char>, Error> = reader::read_carracters(&path, 1);
 
     let characters = match characters {
@@ -56,14 +55,13 @@ pub fn get_n_m_k(file_number: u8, returntype: u8) -> Result<UnionType, SorterErr
     }
 }
 
-pub fn get_klausur_lines_data(file_number: u8) -> HashMap<u8, String> {
+pub fn get_klausur_lines_data(path: &String) -> HashMap<u8, String> {
     //sind von zeile 2 bis 1+n
-    let n: UnionType = get_n_m_k(0, 1).unwrap();
+    let n: UnionType = get_n_m_k(&path, 1).unwrap();
     let n = match n {
         UnionType::Number(n) => n,
         _ => todo!("this can happen, but you dont know how"),
     };
-    let path: String = format!("{}{}.txt", BASEPATH, file_number.to_string());
 
     let mut klausuren_data: HashMap<u8, String> = HashMap::new();
     for x in 2..n + 2 {

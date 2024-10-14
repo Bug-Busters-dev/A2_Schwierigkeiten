@@ -2,8 +2,8 @@ use std::collections::HashMap;
 
 use crate::sorter_util;
 
-pub fn sorter(file_number: u8) {
-    let data: HashMap<u8, String> = sorter_util::get_klausur_lines_data(file_number);
+pub fn sorter(path: String) {
+    let data: HashMap<u8, String> = sorter_util::get_klausur_lines_data(&path);
 
     let mut klausuren_vec: Vec<String> = data.values().cloned().collect();
     for klausur in &mut klausuren_vec {
