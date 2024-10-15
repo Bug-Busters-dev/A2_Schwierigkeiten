@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use std::fmt::Error;
 use std::string::String;
 
-const BASEPATH: &str = "./data/schwierigkeiten";
+// const BASEPATH: &str = "./data/schwierigkeiten";
 
 #[derive(Debug)]
 pub enum UnionType {

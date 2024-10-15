@@ -1,10 +1,7 @@
+use schwierigkeiten::sorter;
 use std::env;
-use std::io::{self, Read};
+use std::io::{self};
 
-pub mod reader;
-pub mod sorter;
-
-pub mod sorter_util;
 const DEFAULT_PATH: &str = "./data/schwierigkeiten0.txt";
 fn main() {
     let args: Vec<String> = env::args().collect();
