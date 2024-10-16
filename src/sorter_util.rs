@@ -35,7 +35,14 @@ impl From<String> for SorterError {
         SorterError::Other(s)
     }
 }
-
+/// returntypes:
+/// ```
+///        1 => Ok(UnionType::Number(characters[0])),
+///        2 => Ok(UnionType::Number(characters[1])),
+///        3 => Ok(UnionType::Number(characters[2])),
+///        4 => Ok(UnionType::Vec(characters)),
+///        _ => Err(SorterError::InvalidReturnType),
+/// ```
 pub fn get_n_m_k(path: &String, returntype: u8) -> Result<UnionType, SorterError> {
     let characters: Result<Vec<char>, Error> = reader::read_carracters(&path, 1);
 

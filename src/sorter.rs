@@ -1,15 +1,53 @@
 use std::collections::HashMap;
 
-use crate::sorter_util;
+use crate::sorter_util::{self, UnionType};
+
+const ABC: &str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 #[allow(dead_code)]
-
-fn resolve_conflicts(old_hash_vec: &Vec<HashMap<char, u16>>) -> &Vec<HashMap<char, u16>> {
+#[allow(unused_variables)]
+#[allow(unused_mut)]
+#[allow(unused_assignments)]
+fn resolve_conflicts(old_hash_vec: &Vec<HashMap<char, u16>>, path: &String) -> () {
     // conflicts sind wenn ein Value N einmal größer ist als ein Value M und einmal kleiner als ein Value M
     // User wird gefragt welcher größer sein soll
     // hash_vec wird entsprechend geupdated
 
-    return old_hash_vec;
+    // finding conflicts
+    for (i, char) in ABC.chars().enumerate() {
+        let m = sorter_util::get_n_m_k(&path, 1).unwrap();
+        let m = match m {
+            UnionType::Number(n) => n,
+            _ => todo!("this can happen, but you dont know how"),
+        };
+        if i > m.try_into().unwrap() {
+            break;
+        }
+
+        for char1 in ABC.chars() {
+            for j in 0..old_hash_vec.len() {
+                for k in 0..old_hash_vec.len() {
+                    for l in 0..old_hash_vec.len() {
+                        if let Some(&val) = old_hash_vec[j].get(&char) {
+                            if let Some(&val1) = old_hash_vec[k].get(&char1) {
+                                if let Some(&val2) = old_hash_vec[l].get(&char) {
+                                    println!("testing: {} {} {}", char, char1, char);
+                                    println!("Values: {} {} {}", val, val1, val2);
+                                    println!("---------------------------------");
+                                    if val > val1 && val < val2 && val1 == val2 {
+                                        println!("Conflict found: {}", char);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // asking user
+        }
+    }
+    println!("No conflicts found");
 }
 
 fn update_hash_map(hash_map: &mut HashMap<char, u16>, max_val: u16, old_val: u16) -> () {
@@ -35,7 +73,7 @@ pub fn sorter(path: String) -> () {
             hash_vec[i].insert(char, (j + 1) as u16);
         }
     }
-
+    resolve_conflicts(&hash_vec, &path);
     let mut changed: bool = true;
     while changed {
         changed = false;
