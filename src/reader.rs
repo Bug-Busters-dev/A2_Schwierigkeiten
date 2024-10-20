@@ -1,5 +1,7 @@
 use core::fmt;
 use std::{fmt::Error, fs::File, io::Read};
+
+/// LINE WIRD AB 1 GEZÄHLT
 pub fn read_file_line(output: &mut String, path: &String, line: usize) {
     let mut file = File::open(path).expect("Unable to open file");
     let mut contents = String::new();
