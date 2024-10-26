@@ -1,7 +1,7 @@
 # Aufgabe 2
 ## usage
 type  
-```sh
+```bash
 cargo run
 ```
 
