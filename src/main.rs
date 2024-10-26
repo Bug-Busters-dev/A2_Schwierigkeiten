@@ -26,3 +26,18 @@ fn end() {
         std::process::exit(0);
     }
 }
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+    #[test]
+    #[ignore]
+    fn test_sorter() {
+        sorter::sorter(DEFAULT_PATH.parse().unwrap());
+    }
+    #[test]
+    fn test_end() {
+        end();
+    }
+}
