@@ -81,11 +81,12 @@ pub fn update_hash_map(
         val += var_plus;
         var_plus += 1;
         hash_map.entry(x).and_modify(|v| *v = val);
+        println!("modified: {}, to be {}", x, val);
         val = 0;
     }
 }
 
-pub fn sorter(path: String) -> () {
+pub fn sorter(path: String) -> Vec<HashMap<char, u16>> {
     let data: HashMap<u8, String> = sorter_util::get_klausur_lines_data(&path);
     println!("{:?}", data);
 
@@ -130,7 +131,8 @@ pub fn sorter(path: String) -> () {
             }
         }
     }
-    println!("{:?}", hash_vec);
+    return hash_vec;
+
 }
 
 // tbs = ToBeSorted (genius)
@@ -167,7 +169,6 @@ pub fn sortout(tbs: &mut Vec<HashMap<char, u16>>) -> String {
     let output: String = sorted_keys.into_iter().map(|(_, keys)| keys).collect::<Vec<_>>().join(" ");
     let output = dedup_str(&output);
     // Print the output
-    println!("{}", output);     
     output
 }
 fn dedup_str(input: &str) -> String {

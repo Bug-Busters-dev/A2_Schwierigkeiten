@@ -1,21 +1,29 @@
+use std::collections::HashMap;
 use std::env;
 use std::io::{self, Write};
 use schwierigkeiten::sorter;
+use schwierigkeiten::sorter::sortout;
 
 const DEFAULT_PATH: &str = "./data/schwierigkeiten1.txt";
 const TEST_PATH: &str = "./data/test/test.txt";
 fn main() {
+    let mut hashvec: Vec<HashMap<char, u16>> = Vec::new();
     let args: Vec<String> = env::args().collect();
     if args.len() > 1 {
         let path = args[1].parse().unwrap();
-        sorter::sorter(path);
+         hashvec = sorter::sorter(path);
     } else {
-        println!("No path provided, using default path: \rdata/schwierigkeiten0.txt");
+        println!("No path provided, using default path: \ndata/schwierigkeiten0.txt");
         press_enter(); 
 
-        let path = DEFAULT_PATH.parse().unwrap();
-        sorter::sorter(path);
+        let default_path = TEST_PATH.parse().unwrap();
+        hashvec = sorter::sorter(default_path);
     }
+    //let output = sorter::sortout(&mut hashvec);
+    let output = hashvec;
+    println!("----------------------------------");
+    println!("{:?}", output);
+    println!("----------------------------------");
     end();
 }
 fn press_enter() {
