@@ -1,15 +1,15 @@
 use schwierigkeiten::sorter;
 use std::env;
-use std::io::{self};
-
+use std::io::{self, Write};
 const DEFAULT_PATH: &str = "./data/schwierigkeiten0.txt";
+const TEST_PATH: &str = "./data/test/test.txt";
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() > 1 {
         let path = args[1].parse().unwrap();
         sorter::sorter(path);
     } else {
-        let path = DEFAULT_PATH.parse().unwrap();
+        let path = TEST_PATH.parse().unwrap();
         sorter::sorter(path);
     }
     end();

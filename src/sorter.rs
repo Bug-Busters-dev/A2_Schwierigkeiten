@@ -56,9 +56,9 @@ pub fn update_hash_map(
     kl_vec: &Vec<String>,
     cchar: char,
 ) -> () {
-    let mut var_plus: u16 = 2;
+    let mut var_plus: u16 = 1;
     let mut chars_iter = kl_vec[kl_number].chars();
-    let mut val = 0;
+    let mut val: u16 = 0;
 
     /* while let Some(c) = chars_iter.next() {
          if c == cchar {
@@ -72,20 +72,28 @@ pub fn update_hash_map(
 
 
     }  */
-
+    println!("chars iter before: {chars_iter:?}");
     'char: while let Some(c) = chars_iter.next() {
         if c == cchar {
+            chars_iter.next();
             break 'char;
         }
-        chars_iter.next();
     }
-    let _ = chars_iter.map(|x| {
+    println!("chars iter  after: {chars_iter:?}");
+    /* let _ = chars_iter.map(|x| {
         val = hash_map.get(&x).unwrap().clone();
         val += var_plus;
         var_plus += 1;
         hash_map.entry(x).and_modify(|v| *v = val);
         val = 0;
-    });
+    });*/
+    for x in chars_iter {
+       val += hash_map.get(&x).unwrap().clone();
+        val += var_plus;
+        var_plus += 1;
+        hash_map.entry(x).and_modify(|v| *v = val);
+        val = 0;
+    }
 }
 
 pub fn sorter(path: String) -> () {
