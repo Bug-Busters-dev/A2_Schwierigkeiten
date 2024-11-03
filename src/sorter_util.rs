@@ -11,7 +11,12 @@ pub enum UnionType {
     String(String),
     Vec(Vec<u32>),
 }
-impl UnionType {}
+impl UnionType {
+    fn get_value(self) -> ()
+    {
+    unimplemented!()
+    }
+}
 #[derive(Debug)]
 pub enum SorterError {
     ReadError(std::io::Error),

@@ -1,7 +1,8 @@
-use schwierigkeiten::sorter;
 use std::env;
 use std::io::{self, Write};
-const DEFAULT_PATH: &str = "./data/schwierigkeiten0.txt";
+use schwierigkeiten::sorter;
+
+const DEFAULT_PATH: &str = "./data/schwierigkeiten1.txt";
 const TEST_PATH: &str = "./data/test/test.txt";
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -9,22 +10,29 @@ fn main() {
         let path = args[1].parse().unwrap();
         sorter::sorter(path);
     } else {
-        let path = TEST_PATH.parse().unwrap();
+        println!("No path provided, using default path: \rdata/schwierigkeiten0.txt");
+        press_enter(); 
+
+        let path = DEFAULT_PATH.parse().unwrap();
         sorter::sorter(path);
     }
     end();
 }
-
-fn end() {
-    println!("Press enter to exit");
-
+fn press_enter() {
+    println!("Press enter to continue");
+    io::stdout().flush().unwrap();
     let mut buffer = String::new();
     io::stdin()
         .read_line(&mut buffer)
         .expect("Failed to read line");
     if buffer == "\n" {
-        std::process::exit(0);
+        return;
     }
+}
+fn end() {
+    println!("Ending program");
+    press_enter();
+    std::process::exit(0); 
 }
 
 #[cfg(test)]
