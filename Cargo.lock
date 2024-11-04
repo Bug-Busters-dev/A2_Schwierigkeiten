@@ -2530,6 +2530,7 @@ dependencies = [
 name = "schwierigkeiten"
 version = "0.1.0"
 dependencies = [
+ "itertools",
  "polars",
 ]
 

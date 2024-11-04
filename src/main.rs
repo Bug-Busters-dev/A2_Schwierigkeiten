@@ -1,7 +1,7 @@
+use schwierigkeiten::sorter;
 use std::collections::HashMap;
 use std::env;
 use std::io::{self, Write};
-use schwierigkeiten::sorter;
 
 #[allow(unused)]
 const DEFAULT_PATH: &str = "./data/schwierigkeiten1.txt";
@@ -16,7 +16,7 @@ fn main() {
         hashvec = sorter::sorter(path);
     } else {
         println!("No path provided, using default path: \ndata/schwierigkeiten0.txt");
-        press_enter(); 
+        press_enter();
 
         let default_path = TEST_PATH.parse().unwrap();
         hashvec = sorter::sorter(default_path);
@@ -42,7 +42,7 @@ fn press_enter() {
 fn end() {
     println!("Ending program");
     press_enter();
-    std::process::exit(0); 
+    std::process::exit(0);
 }
 
 #[cfg(test)]

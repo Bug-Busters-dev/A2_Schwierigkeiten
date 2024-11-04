@@ -1,9 +1,9 @@
-use std::{cmp::max, collections::{HashMap, HashSet}};
+use std::{
+    cmp::max,
+    collections::{HashMap, HashSet},
+};
 
 use crate::sorter_util::{self};
-
-#[allow(dead_code)]
-const ABC: &str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 #[allow(dead_code)]
 #[allow(unused_variables)]
@@ -17,7 +17,7 @@ fn resolve_conflicts(old_hash_vec: &Vec<HashMap<char, u16>>, path: &String) -> (
     // finding conflicts
     {}
     // asking user
-    
+
     {}
     println!("No conflicts found");
 }
@@ -33,7 +33,6 @@ pub fn update_hash_map(
     let mut chars_iter = kl_vec[kl_number].chars();
     let mut val: u16 = 0;
 
-    
     println!("chars iter before: {chars_iter:?}");
     'char: while let Some(c) = chars_iter.next() {
         if c == cchar {
@@ -49,7 +48,7 @@ pub fn update_hash_map(
         val = 0;
     });*/
     for x in chars_iter {
-       val += hash_map.get(&x).unwrap().clone();
+        val += hash_map.get(&x).unwrap().clone();
         val += var_plus;
         var_plus += 1;
         hash_map.entry(x).and_modify(|v| *v = val);
@@ -96,7 +95,7 @@ pub fn sorter(path: String) -> Vec<HashMap<char, u16>> {
                             } else if val_j == max_val {
                                 update_hash_map(&mut hash_vec[i], i, &klausuren_vec, cchar);
                                 println!("valj was maxval");
-                            } 
+                            }
                         }
                     }
                 }
@@ -104,7 +103,6 @@ pub fn sorter(path: String) -> Vec<HashMap<char, u16>> {
         }
     }
     return hash_vec;
-
 }
 
 // tbs = ToBeSorted (genius)
@@ -121,7 +119,10 @@ pub fn sortout(tbs: &Vec<HashMap<char, u16>>) -> String {
     // Populate the value_to_keys HashMap
     for map in tbs {
         for (key, value) in map {
-            value_to_keys.entry(*value).or_insert_with(Vec::new).push(key.to_string());
+            value_to_keys
+                .entry(*value)
+                .or_insert_with(Vec::new)
+                .push(key.to_string());
         }
     }
 
@@ -138,7 +139,11 @@ pub fn sortout(tbs: &Vec<HashMap<char, u16>>) -> String {
     sorted_keys.sort_by_key(|(val, _)| *val);
 
     // Create the final output string
-    let output: String = sorted_keys.into_iter().map(|(_, keys)| keys).collect::<Vec<_>>().join(" ");
+    let output: String = sorted_keys
+        .into_iter()
+        .map(|(_, keys)| keys)
+        .collect::<Vec<_>>()
+        .join(" ");
     let output = dedup_str(&output);
     // Print the output
     output
@@ -148,7 +153,8 @@ fn dedup_str(input: &str) -> String {
     let mut result = String::new();
 
     for ch in input.chars() {
-        if seen.insert(ch) || ch == ' ' { // insert returns false if the character was already present
+        if seen.insert(ch) || ch == ' ' {
+            // insert returns false if the character was already present
             result.push(ch);
         }
     }
@@ -161,11 +167,17 @@ mod tests {
     #[test]
     fn test_sortout() {
         let mut tbs: Vec<HashMap<char, u16>> = vec![
-            vec![('A', 1), ('B', 2), ('C', 3), ('D', 4)].into_iter().collect(),
-            vec![('A', 1), ('B', 2), ('C', 3), ('D', 4)].into_iter().collect(),
-            vec![('A', 1), ('B', 2), ('C', 3), ('D', 4)].into_iter().collect(),
+            vec![('A', 1), ('B', 2), ('C', 3), ('D', 4)]
+                .into_iter()
+                .collect(),
+            vec![('A', 1), ('B', 2), ('C', 3), ('D', 4)]
+                .into_iter()
+                .collect(),
+            vec![('A', 1), ('B', 2), ('C', 3), ('D', 4)]
+                .into_iter()
+                .collect(),
         ];
         let output = &sortout(&mut tbs);
         assert_eq!(output, "A B C D");
-    } 
+    }
 }

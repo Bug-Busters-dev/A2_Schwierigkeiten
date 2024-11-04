@@ -3,5 +3,8 @@ name = "schwierigkeiten"
 version = "0.1.0"
 edition = "2021"
 
+
 [dependencies]
+itertools = "0.13.0"
+
 polars = { version = "0.44.2", features = ["lazy"] }
