@@ -2,21 +2,11 @@ use crate::reader::{self};
 use std::collections::HashMap;
 use std::fmt::Error;
 use std::string::String;
+use crate::uniontype::UnionType;
 
 // const BASEPATH: &str = "./data/schwierigkeiten";
 
-#[derive(Debug)]
-pub enum UnionType {
-    Number(u32),
-    String(String),
-    Vec(Vec<u32>),
-}
-impl UnionType {
-    fn get_value(self) -> ()
-    {
-    unimplemented!()
-    }
-}
+
 #[derive(Debug)]
 pub enum SorterError {
     ReadError(std::io::Error),

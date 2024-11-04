@@ -2,16 +2,18 @@ use std::collections::HashMap;
 use std::env;
 use std::io::{self, Write};
 use schwierigkeiten::sorter;
-use schwierigkeiten::sorter::sortout;
 
+#[allow(unused)]
 const DEFAULT_PATH: &str = "./data/schwierigkeiten1.txt";
 const TEST_PATH: &str = "./data/test/test.txt";
+
+#[allow(unused_assignments)]
 fn main() {
     let mut hashvec: Vec<HashMap<char, u16>> = Vec::new();
     let args: Vec<String> = env::args().collect();
     if args.len() > 1 {
         let path = args[1].parse().unwrap();
-         hashvec = sorter::sorter(path);
+        hashvec = sorter::sorter(path);
     } else {
         println!("No path provided, using default path: \ndata/schwierigkeiten0.txt");
         press_enter(); 

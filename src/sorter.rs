@@ -1,7 +1,8 @@
 use std::{cmp::max, collections::{HashMap, HashSet}};
 
-use crate::sorter_util::{self, UnionType};
+use crate::sorter_util::{self};
 
+#[allow(dead_code)]
 const ABC: &str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 #[allow(dead_code)]
@@ -14,39 +15,10 @@ fn resolve_conflicts(old_hash_vec: &Vec<HashMap<char, u16>>, path: &String) -> (
     // hash_vec wird entsprechend geupdated
 
     // finding conflicts
-    for (i, char) in ABC.chars().enumerate() {
-        let m = sorter_util::get_n_m_k(&path, 1).unwrap();
-        let m = match m {
-            UnionType::Number(n) => n,
-            _ => todo!("this can happen, but you dont know how"),
-        };
-        if i > m.try_into().unwrap() {
-            break;
-        }
-
-        for char1 in ABC.chars() {
-            for j in 0..old_hash_vec.len() {
-                for k in 0..old_hash_vec.len() {
-                    for l in 0..old_hash_vec.len() {
-                        if let Some(&val) = old_hash_vec[j].get(&char) {
-                            if let Some(&val1) = old_hash_vec[k].get(&char1) {
-                                if let Some(&val2) = old_hash_vec[l].get(&char) {
-                                    println!("testing: {} {} {}", char, char1, char);
-                                    println!("Values: {} {} {}", val, val1, val2);
-                                    println!("---------------------------------");
-                                    if val > val1 && val < val2 && val1 == val2 {
-                                        println!("Conflict found: {}", char);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // asking user
-        }
-    }
+    {}
+    // asking user
+    
+    {}
     println!("No conflicts found");
 }
 
@@ -142,7 +114,7 @@ pub fn sorter(path: String) -> Vec<HashMap<char, u16>> {
 // output exmaple:
 // "B A C D"
 // if B: 1, A: 2, C: 3, D: 4
-pub fn sortout(tbs: &mut Vec<HashMap<char, u16>>) -> String {
+pub fn sortout(tbs: &Vec<HashMap<char, u16>>) -> String {
     // Create a new HashMap to hold the grouped keys by values
     let mut value_to_keys: HashMap<u16, Vec<String>> = HashMap::new();
 
