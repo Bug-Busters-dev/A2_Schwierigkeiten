@@ -2,3 +2,4 @@
 /Excel
 .vscode
 .idea
+Cargo.lock
