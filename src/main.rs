@@ -1,10 +1,11 @@
-use schwierigkeiten::sorter;
+use schwierigkeiten::sorter::{self, sortout};
 use std::collections::HashMap;
 use std::env;
 use std::io::{self, Write};
+use std::path::Path;
 
 #[allow(unused)]
-const DEFAULT_PATH: &str = "./data/schwierigkeiten1.txt";
+const DEFAULT_PATH: &str = "./data/schwierigkeiten0.txt";
 const TEST_PATH: &str = "./data/test/test.txt";
 
 #[allow(unused_assignments)]
@@ -18,11 +19,13 @@ fn main() {
         println!("No path provided, using default path: \ndata/schwierigkeiten0.txt");
         press_enter();
 
-        let default_path = TEST_PATH.parse().unwrap();
+        let default_path = DEFAULT_PATH.parse().unwrap();
         hashvec = sorter::sorter(default_path);
     }
     //let output = sorter::sortout(&mut hashvec);
     let output = hashvec;
+
+    let output = sortout(&dbg!(output));
     println!("----------------------------------");
     println!("{:?}", output);
     println!("----------------------------------");

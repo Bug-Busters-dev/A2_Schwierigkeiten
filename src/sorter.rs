@@ -28,10 +28,12 @@ pub fn update_hash_map(
     kl_vec: &Vec<String>,
     cchar: char,
 ) -> () {
+    dbg!(&hash_map);
+    println!("-----------------------------------------------");
     println!("found: {}", cchar);
     let mut var_plus: u16 = 1;
     let mut chars_iter = kl_vec[kl_number].chars();
-    let mut val: u16 = 0;
+    let mut val: u16;
 
     println!("chars iter before: {chars_iter:?}");
     'char: while let Some(c) = chars_iter.next() {
@@ -40,28 +42,20 @@ pub fn update_hash_map(
         }
     }
     println!("chars iter  after: {chars_iter:?}");
-    /* let _ = chars_iter.map(|x| {
-        val = hash_map.get(&x).unwrap().clone();
-        val += var_plus;
-        var_plus += 1;
-        hash_map.entry(x).and_modify(|v| *v = val);
-        val = 0;
-    });*/
+
     for x in chars_iter {
-        val += hash_map.get(&x).unwrap().clone();
-        val += var_plus;
+        val = dbg!(hash_map.get(&cchar).unwrap().clone());
+        val += dbg!(var_plus);
         var_plus += 1;
         hash_map.entry(x).and_modify(|v| *v = val);
         println!("modified: {}, to be {}", x, val);
-        val = 0;
     }
+    println!("-----------------------------------------------");
 }
 
 pub fn sorter(path: String) -> Vec<HashMap<char, u16>> {
-    let data: HashMap<u8, String> = sorter_util::get_klausur_lines_data(&path);
-    println!("{:?}", data);
-
-    let mut klausuren_vec: Vec<String> = data.values().cloned().collect();
+    let mut klausuren_vec: Vec<String> = sorter_util::get_klausur_lines_data(&path);
+    dbg!(&klausuren_vec);
     for klausur in klausuren_vec.iter_mut() {
         *klausur = klausur.replace(" < ", "");
     }
@@ -72,6 +66,7 @@ pub fn sorter(path: String) -> Vec<HashMap<char, u16>> {
             hash_vec[i].insert(char, (j + 1) as u16);
         }
     }
+
     println!("before: {:?}", hash_vec);
 
     let mut changed: bool = true;
