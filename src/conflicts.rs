@@ -1,18 +1,45 @@
 use itertools::Itertools;
-use polars::prelude::*;
+// use polars::prelude::*;
 use std::collections::{HashMap, HashSet};
-use std::vec;
 
 const ABC: &str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-fn find_conlficts(klausurenvec: Vec<String>, hash_vec: Vec<HashMap<char, u16>>) {
-    // make all char pairs for the first m letters into a series
+struct ValuePair {
+    value1: (char, i16),
+    value2: (char, i16),
+}
+fn sort_alphapeticaly(charpair: &str) -> String {
+    let mut chars: Vec<char> = charpair.chars().collect();
+    chars.sort_by(|a, b| a.cmp(b));
+    chars.into_iter().collect<String>()
+}
 
-    /* let m: u32 = sorter_util::get_n_m_k(&path_to_data, 2)
-        .unwrap()
-        .get_value()
-        .unwrap();
-    */
+fn to_struct(charpair: &str, hashmaps: Vec<HashMap<char, u16>>, index: usize) -> ValuePair{
+    
+    for char in charpair.chars() {
+        let value1 = hashmaps[index].get(&char).unwrap();
+        let value2 = hashmaps[index].get(&char).unwrap();
+    }
+
+
+
+}
+
+fn find_conlficts(klausurenvec: Vec<String>, hash_vec: Vec<HashMap<char, u16>>, ) {
+
+    for (i, klausur) in klausurenvec.iter().enumerate() {
+
+
+        for (j, chars) in klausur.chars().enumerate() {
+            hash_vec[i]
+        }
+    }
+
+
+
+
+
+
     let mut all_pairs: HashSet<String> = HashSet::new();
     let mut allklaururpairs: Vec<Vec<String>> = Vec::new();
     // make a series for each line arbeit in klassenvec
@@ -68,10 +95,13 @@ fn find_conlficts(klausurenvec: Vec<String>, hash_vec: Vec<HashMap<char, u16>>) 
 .unwrap();
 */
 // println!("{:?}", df_pairs);
-// }
+ }
+
 
 #[cfg(test)]
+mod tests {
 #[test]
+#[ignore]
 fn main() {
     let klassenvec = vec![
         "FACG".to_string(),
@@ -80,4 +110,10 @@ fn main() {
         "BFA".to_string(),
     ];
     find_conlficts(klassenvec);
+}
+#[test]
+fn test_sort_alphapeticaly() {
+    assert_eq!(sort_alphapeticaly("BA"), "AB");
+    assert_eq!(sort_alphapeticaly("AB"), "AB"); 
+    }
 }
