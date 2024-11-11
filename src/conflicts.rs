@@ -1,7 +1,19 @@
 use itertools::Itertools;
 use polars::prelude::*;
+use std::clone;
 use std::env;
 use std::vec;
+
+fn get_vec_type<T>(vec_opt_type: Vec<Option<T>>) -> Vec<T>
+where
+    T: std::default::Default,
+{
+    vec_opt_type
+        //.into_no_null_iter() // if we are certain we don't have missing values
+        .into_iter()
+        .map(|opt_type| opt_type.unwrap_or_default())
+        .collect()
+}
 
 const ABC: &str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 fn make_df(klassenvec: Vec<String>) -> DataFrame {
@@ -97,7 +109,10 @@ fn _locate_conflicts(_dataframe: DataFrame, klassenvec: Vec<String>) {
         .clone()
         .lazy()
         .group_by(["SortedPairs"])
-        .agg(vec![col("SortedPairs").count().alias("count")])
+        .agg(vec![
+            col("SortedPairs").count().alias("count"),
+            col("CharPairs"),
+        ])
         .filter(col("count").gt(1))
         .collect()
         .unwrap();
@@ -119,11 +134,34 @@ fn _locate_conflicts(_dataframe: DataFrame, klassenvec: Vec<String>) {
         .filter_map(|opt_str| opt_str.map(|s| s.to_string()))
         .collect();
     */
-    /*  for every dublicate we wanna see if the char_series is in the same reinfolge wenn nt dann conflict und user warnen
-     */
+    /*
+        for every dublicate we wanna see if the char_series is in the same reinfolge wenn nt dann conflict und user warnen
+    */
 
-    
-
+    // loop over SortedPairs column and look in CharPairs column in dubliactes
+    let mut char_pair: Vec<String> = Vec::new();
+    for (i, sorted_pair) in dublicates
+        .column("SortedPairs")
+        .unwrap()
+        .str()
+        .unwrap()
+        .iter()
+        .enumerate()
+    {
+        let sorted_pair = sorted_pair.unwrap();
+        for char_pair1 in dublicates.column("CharPairs").unwrap().list().unwrap() {
+            let char_pair1 = char_pair1.unwrap();
+            let char_pair1: Vec<String> = char_pair1
+                .str()
+                .unwrap()
+                .into_iter()
+                .map(|opt| opt.unwrap().to_string())
+                .collect();
+            char_pair.push(char_pair1[i].clone());
+        }
+        println!("---------------------")
+    }
+    println!("{:?}", char_pair);
 }
 
 #[cfg(test)]
@@ -132,8 +170,31 @@ fn main() {
     let klassenvec = vec![
         "FACG".to_string(),
         "BCA".to_string(),
-        "EBA".to_string(),
+        "EAB".to_string(),
         "BFA".to_string(),
+    ];
+    let df = make_df(klassenvec.clone());
+    _locate_conflicts(df, klassenvec);
+}
+#[test]
+fn neu2() {
+    let klassenvec = vec![
+        "ABCDEJI".to_string(),
+        "BCEDIHK".to_string(),
+        "SGHIJ".to_string(),
+        "GHSO".to_string(),
+        "MNOK".to_string(),
+        "KOM".to_string(),
+        "PQRFMN".to_string(),
+        "SFPNK".to_string(),
+        "FTU".to_string(),
+        "VWTZ".to_string(),
+        "YXZT".to_string(),
+        "ZWTVTU".to_string(),
+        "KWZY".to_string(),
+        "ABDEWZXYU".to_string(),
+        "RQKL".to_string(),
+        "PFKOXW".to_string(),
     ];
     let df = make_df(klassenvec.clone());
     _locate_conflicts(df, klassenvec);
