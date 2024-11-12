@@ -12,3 +12,4 @@ git branch -u origin/main main
 git remote set-head origin -a
 ```
 
+nur auf linux
