@@ -157,7 +157,7 @@ fn _locate_conflicts(_dataframe: DataFrame, klassenvec: Vec<String>) {
                 .into_iter()
                 .map(|opt| opt.unwrap().to_string())
                 .collect();
-            char_pair.push(char_pair1[i].clone());
+            println!("{:?}", char_pair1);
         }
         println!("---------------------")
     }
