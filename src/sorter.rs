@@ -3,7 +3,11 @@ use std::{
     collections::{HashMap, HashSet},
 };
 
-use crate::sorter_util::{self};
+use crate::conflicts::*;
+use crate::{
+    conflicts,
+    sorter_util::{self},
+};
 
 #[allow(dead_code)]
 #[allow(unused_variables)]
@@ -60,6 +64,9 @@ pub fn sorter(path: String) -> Vec<HashMap<char, u16>> {
         *klausur = klausur.replace(" < ", "");
     }
     println!("klausurenvec :  {:?}", klausuren_vec);
+    let df = conflicts::make_df(klausuren_vec.clone());
+    conflicts::_locate_conflicts(df, klausuren_vec.clone());
+
     let mut hash_vec: Vec<HashMap<char, u16>> = vec![HashMap::new(); klausuren_vec.len()];
     for (i, klausur) in klausuren_vec.iter().enumerate() {
         for (j, char) in klausur.chars().enumerate() {

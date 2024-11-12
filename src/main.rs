@@ -2,7 +2,6 @@ use schwierigkeiten::sorter::{self, sortout};
 use std::collections::HashMap;
 use std::env;
 use std::io::{self, Write};
-use std::path::Path;
 
 #[allow(unused)]
 const DEFAULT_PATH: &str = "./data/schwierigkeiten0.txt";

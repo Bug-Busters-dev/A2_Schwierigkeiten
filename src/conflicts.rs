@@ -4,19 +4,54 @@ use std::clone;
 use std::env;
 use std::vec;
 
-fn get_vec_type<T>(vec_opt_type: Vec<Option<T>>) -> Vec<T>
-where
-    T: std::default::Default,
-{
-    vec_opt_type
-        //.into_no_null_iter() // if we are certain we don't have missing values
-        .into_iter()
-        .map(|opt_type| opt_type.unwrap_or_default())
-        .collect()
+const ABC: &str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+fn get_conflicts(sorted_pairs: Vec<String>, char_pairs: Vec<Vec<String>>) {
+    // Für jedes `sorted_pairs` Element die `char_pairs` überprüfen
+    for (i, sorted_pair) in sorted_pairs.iter().enumerate() {
+        if i >= char_pairs.len() {
+            println!("Fehler: Keine Daten in char_pairs für {}", sorted_pair);
+            continue;
+        }
+
+        let current_pairs = &char_pairs[i];
+
+        // Erstelle eine Häufigkeitskarte (frequency map) für die Elemente
+        let mut haeufigkeit = std::collections::HashMap::new();
+
+        for pair in current_pairs {
+            let count = haeufigkeit.entry(pair).or_insert(0);
+            *count += 1;
+        }
+
+        // Überprüfe, ob alle Paare gleich sind
+        if haeufigkeit.len() == 1 {
+            println!(
+                "Alle Paare in Gruppe {} sind identisch: {:?}",
+                sorted_pair, current_pairs
+            );
+        } else {
+            // Bestimme die höchste Häufigkeit
+            let max_count = haeufigkeit.values().cloned().max().unwrap_or(0);
+
+            // Finde alle Einträge mit der maximalen Häufigkeit
+            let most_common: Vec<_> = haeufigkeit
+                .iter()
+                .filter(|&(_, &count)| count == max_count)
+                .map(|(pair, _)| (*pair).clone()) // Hier die doppelte Referenz auflösen
+                .collect();
+
+            let mut involved_chars: Vec<_> = haeufigkeit.keys().cloned().collect();
+            involved_chars.sort();
+
+            println!(
+                "Fehler: Uneinheitliche Paare in Gruppe {}: Involvierte Buchstaben: {:?}, häufigste Elemente: {:?}",
+                sorted_pair, involved_chars, most_common
+            );
+        }
+    }
 }
 
-const ABC: &str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-fn make_df(klassenvec: Vec<String>) -> DataFrame {
+pub fn make_df(klassenvec: Vec<String>) -> DataFrame {
     // make all char pairs for the first m letters into a series
     /* let m: u32 = sorter_util::get_n_m_k(&path_to_data, 2)
         .unwrap()
@@ -24,7 +59,6 @@ fn make_df(klassenvec: Vec<String>) -> DataFrame {
         .unwrap();
     */
     env::set_var("POLARS_FMT_MAX_ROWS", "100");
-    let all_pairs: Vec<String> = Vec::new();
     let mut pair_combinations: Vec<Vec<String>> = Vec::new();
     let mut klausur_numbers: Vec<u16> = Vec::new();
     // make a series for each line arbeit in klassenvec
@@ -100,10 +134,8 @@ fn make_df(klassenvec: Vec<String>) -> DataFrame {
     df_pairs
 }
 
-fn _locate_conflicts(_dataframe: DataFrame, klassenvec: Vec<String>) {
+pub fn _locate_conflicts(_dataframe: DataFrame, klassenvec: Vec<String>) {
     let df = make_df(klassenvec);
-    let pairs = df.get_columns().iter().nth(1).unwrap();
-    let pairs_series: Series = pairs.as_series().unwrap().to_owned();
 
     let dublicates = df
         .clone()
@@ -139,29 +171,24 @@ fn _locate_conflicts(_dataframe: DataFrame, klassenvec: Vec<String>) {
     */
 
     // loop over SortedPairs column and look in CharPairs column in dubliactes
-    let mut char_pair: Vec<String> = Vec::new();
-    for (i, sorted_pair) in dublicates
-        .column("SortedPairs")
-        .unwrap()
-        .str()
-        .unwrap()
-        .iter()
-        .enumerate()
-    {
+    let mut sorted_pairs: Vec<String> = Vec::new();
+    let mut char_pairs: Vec<Vec<String>> = Vec::new();
+    for sorted_pair in dublicates.column("SortedPairs").unwrap().str().unwrap() {
         let sorted_pair = sorted_pair.unwrap();
-        for char_pair1 in dublicates.column("CharPairs").unwrap().list().unwrap() {
-            let char_pair1 = char_pair1.unwrap();
-            let char_pair1: Vec<String> = char_pair1
-                .str()
-                .unwrap()
-                .into_iter()
-                .map(|opt| opt.unwrap().to_string())
-                .collect();
-            println!("{:?}", char_pair1);
-        }
-        println!("---------------------")
+        sorted_pairs.push(sorted_pair.to_string());
     }
-    println!("{:?}", char_pair);
+    println!("{:?}", char_pairs);
+    for char_pair1 in dublicates.column("CharPairs").unwrap().list().unwrap() {
+        let char_pair1 = char_pair1.unwrap();
+        let char_pair1: Vec<String> = char_pair1
+            .str()
+            .unwrap()
+            .into_iter()
+            .map(|opt| opt.unwrap().to_string())
+            .collect();
+        char_pairs.push(char_pair1);
+    }
+    get_conflicts(sorted_pairs, char_pairs);
 }
 
 #[cfg(test)]
