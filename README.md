@@ -4,5 +4,6 @@ type
 ```bash
 cargo run
 ```
+geht nur auf linux
 
 
