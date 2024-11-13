@@ -1,5 +1,6 @@
-3 6 5
+4 6 5
 B < A < D < C
 E < B < A
 B < F < A
-A B C D E F
+F < A < C < G
+A B C D E F G

@@ -1,22 +1,11 @@
 use crate::reader::{self};
+use crate::uniontype::UnionType;
 use std::collections::HashMap;
 use std::fmt::Error;
 use std::string::String;
 
 // const BASEPATH: &str = "./data/schwierigkeiten";
 
-#[derive(Debug)]
-pub enum UnionType {
-    Number(u32),
-    String(String),
-    Vec(Vec<u32>),
-}
-impl UnionType {
-    fn get_value(self) -> ()
-    {
-    unimplemented!()
-    }
-}
 #[derive(Debug)]
 pub enum SorterError {
     ReadError(std::io::Error),
@@ -67,7 +56,7 @@ pub fn get_n_m_k(path: &String, returntype: u8) -> Result<UnionType, SorterError
     }
 }
 
-pub fn get_klausur_lines_data(path: &String) -> HashMap<u8, String> {
+pub fn get_klausur_lines_data(path: &String) -> Vec<String> {
     //sind von zeile 2 bis 1+n
     let n: UnionType = get_n_m_k(&path, 1).unwrap();
     let n = match n {
@@ -75,11 +64,11 @@ pub fn get_klausur_lines_data(path: &String) -> HashMap<u8, String> {
         _ => todo!("this can happen, but you dont know how"),
     };
 
-    let mut klausuren_data: HashMap<u8, String> = HashMap::new();
+    let mut klausuren_data: Vec<String> = Vec::new();
     for x in 2..n + 2 {
         let mut output: String = String::new();
         reader::read_file_line(&mut output, &path, x.try_into().unwrap());
-        klausuren_data.insert((x - 1).try_into().unwrap(), output);
+        klausuren_data.push(output);
     }
     return klausuren_data;
 }

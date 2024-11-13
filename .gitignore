@@ -1,2 +1,5 @@
 /target
 /Excel
+.vscode
+.idea
+Cargo.lock
