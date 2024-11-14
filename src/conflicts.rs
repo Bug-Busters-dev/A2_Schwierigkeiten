@@ -1,12 +1,14 @@
 use colored::Colorize;
+use core::panic;
 use itertools::Itertools;
 use polars::prelude::*;
 use std::env;
 use std::vec;
 
-fn get_conflicts(sorted_pairs: Vec<String>, char_pairs: Vec<Vec<String>>) {
+fn get_conflicts(sorted_pairs: Vec<String>, char_pairs: Vec<Vec<String>>) -> bool {
     let mut is_conflict = false;
-    // Für jedes `sorted_pairs` Element die `char_pairs` überprüfen
+    // element sortedpair in char_pairs suchen
+    let mut all_conflicts: Vec<String> = Vec::new();
     for (i, sorted_pair) in sorted_pairs.iter().enumerate() {
         if i >= char_pairs.len() {
             println!("Fehler: Keine Daten in char_pairs für {}", sorted_pair);
@@ -15,7 +17,7 @@ fn get_conflicts(sorted_pairs: Vec<String>, char_pairs: Vec<Vec<String>>) {
 
         let current_pairs = &char_pairs[i];
 
-        // Erstelle eine Häufigkeitskarte (frequency map) für die Elemente
+        // Erstelle eine Häufigkeitshashmap für die Elemente
         let mut haeufigkeit = std::collections::HashMap::new();
 
         for pair in current_pairs {
@@ -24,16 +26,17 @@ fn get_conflicts(sorted_pairs: Vec<String>, char_pairs: Vec<Vec<String>>) {
         }
 
         // Überprüfe, ob alle Paare gleich sind
+        // also ob die Häufigkeitshashmap nur einen Eintrag hat denn dann sind all pare gleich rum angeordnet
         if haeufigkeit.len() == 1 {
             println!(
                 "Alle Paare in Gruppe {} sind identisch: {:?}",
                 sorted_pair, current_pairs
             );
         } else {
-            // Bestimme die höchste Häufigkeit
+            // Bestimme die höchste Häufigkeit eines charpairs
             let max_count = haeufigkeit.values().cloned().max().unwrap_or(0);
 
-            // Finde alle Einträge mit der maximalen Häufigkeit
+            // Finde alle Einträge mit der maximalen Häufigkeit also die häufigsten Elemente
             let most_common: Vec<_> = haeufigkeit
                 .iter()
                 .filter(|&(_, &count)| count == max_count)
@@ -47,13 +50,16 @@ fn get_conflicts(sorted_pairs: Vec<String>, char_pairs: Vec<Vec<String>>) {
                 "Fehler: Uneinheitliche Paare in Gruppe {}: Involvierte Buchstaben: {:?}, häufigste Elemente: {:?}",
                 sorted_pair, involved_chars, most_common
             );
+            all_conflicts.push(sorted_pair.clone());
             is_conflict = true;
         }
     }
     if is_conflict {
         println!("{}", "Es gibt Konflikte in den Daten".red());
+        return false;
     } else {
         println!("Es gibt keine Konflikte in den Daten");
+        return true;
     }
 }
 
@@ -194,7 +200,10 @@ pub fn locate_conflicts(_dataframe: DataFrame, klassenvec: Vec<String>) {
             .collect();
         char_pairs.push(char_pair1);
     }
-    get_conflicts(sorted_pairs, char_pairs);
+    if get_conflicts(sorted_pairs, char_pairs) == false {
+        println!("{}", "Es gibt Konflikte in den Daten".red());
+        std::process::exit(1);
+    }
 }
 
 #[cfg(test)]

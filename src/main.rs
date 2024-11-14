@@ -4,7 +4,7 @@ use std::env;
 use std::io::{self, Write};
 
 #[allow(unused)]
-const DEFAULT_PATH: &str = "./data/schwierigkeiten0.txt";
+const DEFAULT_PATH: &str = "./data/schwierigkeiten3.txt";
 #[allow(unused)]
 const TEST_PATH: &str = "./data/test/test.txt";
 
@@ -12,6 +12,7 @@ const TEST_PATH: &str = "./data/test/test.txt";
 fn main() {
     let mut hashvec: Vec<HashMap<char, u16>> = Vec::new();
     let args: Vec<String> = env::args().collect();
+    println!("{:?}", args);
     if args.len() > 1 {
         let path = args[1].parse().unwrap();
         hashvec = sorter::sorter(path);
