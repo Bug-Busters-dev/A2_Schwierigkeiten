@@ -1,6 +1,5 @@
 use crate::reader::{self};
 use crate::uniontype::UnionType;
-use std::collections::HashMap;
 use std::fmt::Error;
 use std::string::String;
 

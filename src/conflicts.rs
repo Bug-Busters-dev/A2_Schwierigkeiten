@@ -1,11 +1,11 @@
+use colored::Colorize;
 use itertools::Itertools;
 use polars::prelude::*;
-use std::clone;
 use std::env;
 use std::vec;
 
-const ABC: &str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 fn get_conflicts(sorted_pairs: Vec<String>, char_pairs: Vec<Vec<String>>) {
+    let mut is_conflict = false;
     // Für jedes `sorted_pairs` Element die `char_pairs` überprüfen
     for (i, sorted_pair) in sorted_pairs.iter().enumerate() {
         if i >= char_pairs.len() {
@@ -47,7 +47,13 @@ fn get_conflicts(sorted_pairs: Vec<String>, char_pairs: Vec<Vec<String>>) {
                 "Fehler: Uneinheitliche Paare in Gruppe {}: Involvierte Buchstaben: {:?}, häufigste Elemente: {:?}",
                 sorted_pair, involved_chars, most_common
             );
+            is_conflict = true;
         }
+    }
+    if is_conflict {
+        println!("{}", "Es gibt Konflikte in den Daten".red());
+    } else {
+        println!("Es gibt keine Konflikte in den Daten");
     }
 }
 
@@ -134,7 +140,7 @@ pub fn make_df(klassenvec: Vec<String>) -> DataFrame {
     df_pairs
 }
 
-pub fn _locate_conflicts(_dataframe: DataFrame, klassenvec: Vec<String>) {
+pub fn locate_conflicts(_dataframe: DataFrame, klassenvec: Vec<String>) {
     let df = make_df(klassenvec);
 
     let dublicates = df
@@ -201,7 +207,7 @@ fn main() {
         "BFA".to_string(),
     ];
     let df = make_df(klassenvec.clone());
-    _locate_conflicts(df, klassenvec);
+    locate_conflicts(df, klassenvec);
 }
 #[test]
 fn neu2() {
@@ -224,5 +230,5 @@ fn neu2() {
         "PFKOXW".to_string(),
     ];
     let df = make_df(klassenvec.clone());
-    _locate_conflicts(df, klassenvec);
+    locate_conflicts(df, klassenvec);
 }

@@ -3,28 +3,10 @@ use std::{
     collections::{HashMap, HashSet},
 };
 
-use crate::conflicts::*;
 use crate::{
     conflicts,
     sorter_util::{self},
 };
-
-#[allow(dead_code)]
-#[allow(unused_variables)]
-#[allow(unused_mut)]
-#[allow(unused_assignments)]
-fn resolve_conflicts(old_hash_vec: &Vec<HashMap<char, u16>>, path: &String) -> () {
-    // conflicts sind wenn ein Value N einmal größer ist als ein Value M und einmal kleiner als ein Value M
-    // User wird gefragt welcher größer sein soll
-    // hash_vec wird entsprechend geupdated
-
-    // finding conflicts
-    {}
-    // asking user
-
-    {}
-    println!("No conflicts found");
-}
 
 pub fn update_hash_map(
     hash_map: &mut HashMap<char, u16>,
@@ -65,7 +47,7 @@ pub fn sorter(path: String) -> Vec<HashMap<char, u16>> {
     }
     println!("klausurenvec :  {:?}", klausuren_vec);
     let df = conflicts::make_df(klausuren_vec.clone());
-    conflicts::_locate_conflicts(df, klausuren_vec.clone());
+    conflicts::locate_conflicts(df, klausuren_vec.clone());
 
     let mut hash_vec: Vec<HashMap<char, u16>> = vec![HashMap::new(); klausuren_vec.len()];
     for (i, klausur) in klausuren_vec.iter().enumerate() {

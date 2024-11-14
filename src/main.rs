@@ -5,6 +5,7 @@ use std::io::{self, Write};
 
 #[allow(unused)]
 const DEFAULT_PATH: &str = "./data/schwierigkeiten0.txt";
+#[allow(unused)]
 const TEST_PATH: &str = "./data/test/test.txt";
 
 #[allow(unused_assignments)]
