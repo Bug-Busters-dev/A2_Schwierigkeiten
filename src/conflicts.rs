@@ -5,7 +5,7 @@ use polars::prelude::*;
 use std::env;
 use std::vec;
 
-fn get_conflicts(sorted_pairs: Vec<String>, char_pairs: Vec<Vec<String>>) -> bool {
+fn get_conflicts(sorted_pairs: Vec<String>, char_pairs: Vec<Vec<String>>, df: DataFrame) -> bool {
     let mut is_conflict = false;
     // element sortedpair in char_pairs suchen
     let mut all_conflicts: Vec<String> = Vec::new();
@@ -57,6 +57,17 @@ fn get_conflicts(sorted_pairs: Vec<String>, char_pairs: Vec<Vec<String>>) -> boo
     if is_conflict {
         println!("{}", "Es gibt Konflikte in den Daten".red());
         return false;
+
+        for conflict in all_conflicts {
+            let mut conflicts = df
+                .clone()
+                .lazy()
+                .filter(col("SortedPairs").eq(conflict))
+                .select(&["CharPairs", "Klausur"])
+                .collect()
+                .unwrap();
+            println!("{:?}", conflicts);
+        }
     } else {
         println!("Es gibt keine Konflikte in den Daten");
         return true;
@@ -200,7 +211,7 @@ pub fn locate_conflicts(_dataframe: DataFrame, klassenvec: Vec<String>) {
             .collect();
         char_pairs.push(char_pair1);
     }
-    if get_conflicts(sorted_pairs, char_pairs) == false {
+    if get_conflicts(sorted_pairs, char_pairs, df) == false {
         println!("{}", "Es gibt Konflikte in den Daten".red());
         std::process::exit(1);
     }
