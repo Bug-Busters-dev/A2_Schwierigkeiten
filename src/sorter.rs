@@ -47,7 +47,7 @@ pub fn sorter(path: String) -> Vec<HashMap<char, u16>> {
     }
     println!("klausurenvec :  {:?}", klausuren_vec);
     let df = conflicts::make_df(klausuren_vec.clone());
-    conflicts::locate_conflicts(df, klausuren_vec.clone());
+    let klausuren_vec = conflicts::locate_conflicts(df, klausuren_vec.clone());
 
     let mut hash_vec: Vec<HashMap<char, u16>> = vec![HashMap::new(); klausuren_vec.len()];
     for (i, klausur) in klausuren_vec.iter().enumerate() {

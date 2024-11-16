@@ -1,77 +1,103 @@
 use colored::Colorize;
-use core::panic;
 use itertools::Itertools;
 use polars::prelude::*;
 use std::env;
+use std::io;
 use std::vec;
 
-fn get_conflicts(sorted_pairs: Vec<String>, char_pairs: Vec<Vec<String>>, df: DataFrame) -> bool {
-    let mut is_conflict = false;
-    // element sortedpair in char_pairs suchen
-    let mut all_conflicts: Vec<String> = Vec::new();
+fn get_conflicts(
+    sorted_pairs: Vec<String>,
+    char_pairs: Vec<Vec<String>>,
+    klassenvec: &mut Vec<String>,
+) -> Vec<String> {
+    // Überprüfe jede Gruppe in `sorted_pairs` mit den entsprechenden `char_pairs`
     for (i, sorted_pair) in sorted_pairs.iter().enumerate() {
         if i >= char_pairs.len() {
-            println!("Fehler: Keine Daten in char_pairs für {}", sorted_pair);
+            println!("Fehler: Keine Daten in `char_pairs` für {}", sorted_pair);
             continue;
         }
 
         let current_pairs = &char_pairs[i];
 
-        // Erstelle eine Häufigkeitshashmap für die Elemente
-        let mut haeufigkeit = std::collections::HashMap::new();
-
-        for pair in current_pairs {
-            let count = haeufigkeit.entry(pair).or_insert(0);
-            *count += 1;
-        }
+        // Sammle alle involvierten Paare ohne Frequenz
+        let mut involved_chars: Vec<_> = current_pairs.iter().cloned().collect();
+        involved_chars.sort();
+        involved_chars.dedup(); // Entfernt Duplikate, sodass jedes involvierte Paar nur einmal vorkommt
 
         // Überprüfe, ob alle Paare gleich sind
-        // also ob die Häufigkeitshashmap nur einen Eintrag hat denn dann sind all pare gleich rum angeordnet
-        if haeufigkeit.len() == 1 {
+        if involved_chars.len() == 1 {
             println!(
                 "Alle Paare in Gruppe {} sind identisch: {:?}",
                 sorted_pair, current_pairs
             );
         } else {
-            // Bestimme die höchste Häufigkeit eines charpairs
-            let max_count = haeufigkeit.values().cloned().max().unwrap_or(0);
-
-            // Finde alle Einträge mit der maximalen Häufigkeit also die häufigsten Elemente
-            let most_common: Vec<_> = haeufigkeit
-                .iter()
-                .filter(|&(_, &count)| count == max_count)
-                .map(|(pair, _)| (*pair).clone()) // Hier die doppelte Referenz auflösen
-                .collect();
-
-            let mut involved_chars: Vec<_> = haeufigkeit.keys().cloned().collect();
-            involved_chars.sort();
-
             println!(
-                "Fehler: Uneinheitliche Paare in Gruppe {}: Involvierte Buchstaben: {:?}, häufigste Elemente: {:?}",
-                sorted_pair, involved_chars, most_common
+                "Fehler: Uneinheitliche Paare in Gruppe {}: Involvierte Paare: {:?}",
+                sorted_pair, involved_chars
             );
-            all_conflicts.push(sorted_pair.clone());
-            is_conflict = true;
-        }
-    }
-    if is_conflict {
-        println!("{}", "Es gibt Konflikte in den Daten".red());
-        return false;
+            // print the current data with < between chars
+            println!("Jetztige daten:");
+            println!("-----------------");
+            for line in klassenvec.iter() {
+                // highlight the conflicting pairs
+                for c in line.chars() {
+                    if involved_chars[1].contains(&c.to_string())
+                        || involved_chars[0].contains(&c.to_string())
+                    {
+                        print!(" {} ", c.to_string().red());
+                    } else {
+                        print!(" {} ", c);
+                    }
+                }
+                println!();
+            }
+            println!("-----------------");
 
-        for conflict in all_conflicts {
-            let mut conflicts = df
-                .clone()
-                .lazy()
-                .filter(col("SortedPairs").eq(conflict))
-                .select(&["CharPairs", "Klausur"])
-                .collect()
-                .unwrap();
-            println!("{:?}", conflicts);
+            // Benutzer nach dem bevorzugten Paar fragen
+            println!(
+                "Bitte wählen Sie das bevorzugte Paar aus den folgenden Optionen: {:?}",
+                involved_chars
+            );
+
+            // Benutzereingabe einlesen
+            let mut preferred_pair = String::new();
+            io::stdin()
+                .read_line(&mut preferred_pair)
+                .expect("Fehler beim Lesen der Eingabe");
+
+            let mut preferred_pair = preferred_pair.trim().to_string();
+
+            // Sicherstellen, dass die Eingabe gültig ist
+            if !involved_chars.contains(&&preferred_pair) {
+                println!("Ungültige Eingabe. Bitte versuchen Sie es erneut.");
+
+                // für das gleiche Paar erneut fragen
+                loop {
+                    preferred_pair.clear();
+                    io::stdin()
+                        .read_line(&mut preferred_pair)
+                        .expect("Fehler beim Lesen der Eingabe");
+                    let preferred_pair = preferred_pair.trim().to_string();
+                    dbg!(&preferred_pair);
+                    if involved_chars.contains(&preferred_pair) {
+                        break;
+                    } else {
+                        println!("Ungültige Eingabe. Bitte versuchen Sie es erneut.");
+                    }
+                }
+            }
+
+            // `klausuren`-Vektor aktualisieren, indem alle involvierten Paare auf das bevorzugte Paar gesetzt werden
+            for entry in klassenvec.iter_mut() {
+                for pair in &involved_chars {
+                    *entry = entry.replace(pair.as_str(), dbg!(&preferred_pair.trim()));
+                }
+            }
+
+            println!("Der aktualisierte klausuren-Vektor ist: {:?}", klassenvec);
         }
-    } else {
-        println!("Es gibt keine Konflikte in den Daten");
-        return true;
     }
+    return klassenvec.to_owned();
 }
 
 pub fn make_df(klassenvec: Vec<String>) -> DataFrame {
@@ -157,8 +183,8 @@ pub fn make_df(klassenvec: Vec<String>) -> DataFrame {
     df_pairs
 }
 
-pub fn locate_conflicts(_dataframe: DataFrame, klassenvec: Vec<String>) {
-    let df = make_df(klassenvec);
+pub fn locate_conflicts(_dataframe: DataFrame, klassenvec: Vec<String>) -> Vec<String> {
+    let df = make_df(klassenvec.clone());
 
     let dublicates = df
         .clone()
@@ -211,10 +237,7 @@ pub fn locate_conflicts(_dataframe: DataFrame, klassenvec: Vec<String>) {
             .collect();
         char_pairs.push(char_pair1);
     }
-    if get_conflicts(sorted_pairs, char_pairs, df) == false {
-        println!("{}", "Es gibt Konflikte in den Daten".red());
-        std::process::exit(1);
-    }
+    return get_conflicts(sorted_pairs, char_pairs, &mut klassenvec.clone());
 }
 
 #[cfg(test)]
@@ -248,6 +271,24 @@ fn neu2() {
         "ABDEWZXYU".to_string(),
         "RQKL".to_string(),
         "PFKOXW".to_string(),
+    ];
+    let df = make_df(klassenvec.clone());
+    locate_conflicts(df, klassenvec);
+}
+#[test]
+fn neu3() {
+    let klassenvec = vec![
+        "HSCGA".to_string(),
+        "SOJLF".to_string(),
+        "MODXU".to_string(),
+        "SCENM".to_string(),
+        "EMFXB".to_string(),
+        "DGPXA".to_string(),
+        "RLXUT".to_string(),
+        "MOFVD".to_string(),
+        "SOUTP".to_string(),
+        "ZQKXI".to_string(),
+        "BWIY".to_string(),
     ];
     let df = make_df(klassenvec.clone());
     locate_conflicts(df, klassenvec);

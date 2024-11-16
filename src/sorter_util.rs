@@ -43,14 +43,19 @@ pub fn get_n_m_k(path: &String, returntype: u8) -> Result<UnionType, SorterError
         Ok(chars) => chars,
         Err(e) => return Err(SorterError::from(e)),
     };
+    let numbers: Vec<u32> = characters
+        .iter()
+        .collect::<String>() // Convert Vec<char> to String
+        .split_whitespace() // Split by whitespace to handle multi-digit numbers
+        .filter_map(|s| s.parse().ok()) // Parse each split string as u32
+        .collect();
 
-    let characters: Vec<u32> = characters.iter().filter_map(|&c| c.to_digit(10)).collect();
-
+    // TODO: make it work with 2 digit numbers
     match returntype {
-        1 => Ok(UnionType::Number(characters[0])),
-        2 => Ok(UnionType::Number(characters[1])),
-        3 => Ok(UnionType::Number(characters[2])),
-        4 => Ok(UnionType::Vec(characters)),
+        1 => Ok(UnionType::Number(numbers[0])),
+        2 => Ok(UnionType::Number(numbers[1])),
+        3 => Ok(UnionType::Number(numbers[2])),
+        4 => Ok(UnionType::Vec(numbers)),
         _ => Err(SorterError::InvalidReturnType),
     }
 }
