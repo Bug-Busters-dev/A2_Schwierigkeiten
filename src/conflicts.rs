@@ -5,6 +5,39 @@ use std::env;
 use std::io;
 use std::vec;
 
+fn replace_pairs(klausur: &str, pair1: &str, pair2: &str) -> String {
+    let mut result = klausur.to_string();
+    let first_char_p2 = pair2.chars().nth(0).unwrap();
+    let second_char_p2 = pair2.chars().nth(1).unwrap();
+
+    let first_char_p1 = pair1.chars().nth(0).unwrap();
+    let second_char_p1 = pair1.chars().nth(1).unwrap();
+
+    // wenn first_char_p1 und second_char_p1 in klausur sind (in richtiger Reihenfolge)
+    // nutze iter um zu überprüfen ob die chars in der richtigen Reihenfolge sind
+    if klausur.chars().position(|c| c == first_char_p2)
+        > klausur.chars().position(|c| c == second_char_p2)
+    {
+        println!("OK");
+        // wenn pair1 in klausur ist
+        println!("first_char_p1: {}", first_char_p1);
+        println!("second_char_p1: {}", second_char_p1);
+        println!("first_char_p2: {}", first_char_p2);
+        println!("second_char_p2: {}", second_char_p2);
+        // only replace first occurence
+        result = result.replacen(first_char_p2, &second_char_p2.to_string(), 1);
+        println!("Result1: {}", result);
+        // only replace second occurence of the char (nn would replace 2. n)
+        result = result.replacen(first_char_p1, &second_char_p1.to_string(), 1);
+        println!("Result2: {}", result);
+
+        // Check if first_char_p1 and second_char_p1 are in `klausur` in the correct order
+    }
+    result
+
+    // pair 2 ist das erwünschte pair
+}
+
 fn get_conflicts(
     sorted_pairs: Vec<String>,
     char_pairs: Vec<Vec<String>>,
@@ -52,44 +85,92 @@ fn get_conflicts(
                 println!();
             }
             println!("-----------------");
-
-            // Benutzer nach dem bevorzugten Paar fragen
-
-            let mut preferred_pair = String::new();
-            io::stdin()
-                .read_line(&mut preferred_pair)
-                .expect("Fehler beim Lesen der Eingabe");
-
-            let mut preferred_pair = preferred_pair.trim().to_string();
-
-            // Sicherstellen, dass die Eingabe gültig ist
-            if !involved_chars.contains(&&preferred_pair) {
-                println!("Ungültige Eingabe. Bitte versuchen Sie es erneut.");
-
-                // für das gleiche Paar erneut fragen
+            loop {
+                let change_type: u8;
                 loop {
-                    preferred_pair.clear();
+                    println!("Du kannst ein buchstabe löschen (1 eintippen), oder die anordnung der buchstaben ändern (2 eintippen)");
+                    let mut val = String::new();
+                    io::stdin()
+                        .read_line(&mut val)
+                        .expect("Fehler beim lesen der Eingabe");
+                    match val.trim().parse::<u8>() {
+                        Ok(val) => {
+                            change_type = val;
+                            break;
+                        }
+                        Err(_) => {
+                            println!("Bitte geben Sie eine gültige Zahl ein.");
+                        }
+                    }
+                }
+
+                // Benutzer nach dem bevorzugten Paar fragen
+                if change_type == 2 {
+                    let mut preferred_pair = String::new();
                     io::stdin()
                         .read_line(&mut preferred_pair)
                         .expect("Fehler beim Lesen der Eingabe");
-                    let preferred_pair = preferred_pair.trim().to_string();
-                    dbg!(&preferred_pair);
-                    if involved_chars.contains(&preferred_pair) {
-                        break;
-                    } else {
+
+                    let mut preferred_pair = preferred_pair.trim().to_string();
+
+                    // Sicherstellen, dass die Eingabe gültig ist
+                    if !involved_chars.contains(&&preferred_pair) {
                         println!("Ungültige Eingabe. Bitte versuchen Sie es erneut.");
+
+                        // für das gleiche Paar erneut fragen
+                        loop {
+                            preferred_pair.clear();
+                            io::stdin()
+                                .read_line(&mut preferred_pair)
+                                .expect("Fehler beim Lesen der Eingabe");
+                            let preferred_pair = preferred_pair.trim().to_string();
+                            dbg!(&preferred_pair);
+                            if involved_chars.contains(&preferred_pair) {
+                                break;
+                            } else {
+                                println!("Ungültige Eingabe. Bitte versuchen Sie es erneut.");
+                            }
+                        }
                     }
+
+                    // `klausuren`-Vektor aktualisieren, indem alle involvierten Paare auf das bevorzugte Paar gesetzt werden
+                    for entry in klassenvec.iter_mut() {
+                        println!("Vorherige Klausur: {}", entry);
+                        for pair in &involved_chars {
+                            *entry =
+                                replace_pairs(entry, pair.as_str(), dbg!(&preferred_pair.trim()));
+                        }
+                        println!("Aktualisierte Klausur: {}", entry);
+                        println!("----------------------------")
+                    }
+
+                    println!("Der aktualisierte klausuren-Vektor ist: {:?}", klassenvec);
+                    break;
+                } else if change_type == 1 {
+                    println!("Welcher buchstabe und in welcher klausur (Zähle ab 1) zB. a1 wäre klausur 1 der buchstabe a");
+                    let mut output = String::new();
+                    io::stdin()
+                        .read_line(&mut output)
+                        .expect("Fehler beim Lesen der Eingabe");
+                    if let Some((char_to_remove, index_str)) = output.split_once(' ') {
+                        if let Ok(index) = index_str.parse::<usize>() {
+                            if index > 0 && index <= klassenvec.len() {
+                                let char_to_remove = char_to_remove.trim();
+                                let klausur = &mut klassenvec[index - 1];
+                                *klausur = klausur.replace(char_to_remove, "");
+                                println!(
+                                    "Der Buchstabe {} wurde aus der Klausur {} entfernt.",
+                                    char_to_remove, index
+                                );
+                            }
+                        }
+                        break;
+                    }
+                } else {
+                    println!("Please write 1 or 2");
+                    continue;
                 }
             }
-
-            // `klausuren`-Vektor aktualisieren, indem alle involvierten Paare auf das bevorzugte Paar gesetzt werden
-            for entry in klassenvec.iter_mut() {
-                for pair in &involved_chars {
-                    *entry = entry.replace(pair.as_str(), dbg!(&preferred_pair.trim()));
-                }
-            }
-
-            println!("Der aktualisierte klausuren-Vektor ist: {:?}", klassenvec);
         }
     }
     return klassenvec.to_owned();
@@ -135,23 +216,6 @@ pub fn make_df(klassenvec: Vec<String>) -> DataFrame {
         .iter()
         .map(|x| x.chars().sorted().collect::<String>())
         .collect::<Vec<String>>();
-    // let mut all_series: Vec<Series> = Vec::new();
-    // make a series for each vec in vecvec
-    //for (i, vec) in vecvec.iter().enumerate() {
-    //    ljkjjet slice_vec: Vec<&str> = vec.iter().map(|x| x.as_str()).collect();
-    //    let series = Series::new(format!("Arbeit_{}", i).into(), slice_vec);
-    //    all_series.push(series);
-    //}i
-    //let max_len = all_series.iter().map(|s| s.len()).max().unwrap_or(0);
-    //for series in all_series.iter_mut() {
-    //    if series.len() < max_len {
-    //        let pad_count = max_len - series.len();
-    //        let padding: Vec<&str> = vec![""; pad_count];
-    //        series.append(&Series::new("null".into(), padding)).unwrap();
-    //    }
-    //}
-    // make a dataframe from all_series
-
     let char_series: Series = Series::new("CharPairs".into(), pair_combinations)
         .cast(&DataType::String)
         .unwrap();

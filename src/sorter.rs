@@ -8,6 +8,38 @@ use crate::{
     sorter_util::{self},
 };
 
+fn klausurenvec_bereinigen(mut klausuren: Vec<String>) -> Vec<String> {
+    // Alle Paare sammeln, die in mindestens einer Klausur vorkommen
+    let mut alle_paare = HashSet::new();
+    for klausur in &klausuren {
+        for pair in klausur.chars().collect::<Vec<_>>().windows(2) {
+            let pair_str = pair.iter().collect::<String>();
+            alle_paare.insert(pair_str);
+        }
+    }
+
+    // Klausuren filtern: Behalte nur solche, die Paare mit mindestens einer anderen Klausur teilen
+    klausuren.retain(|klausur| {
+        let mut hat_geteilte_paare = false;
+
+        // Überprüfe jedes Paar in der Klausur
+        for pair in klausur.chars().collect::<Vec<_>>().windows(2) {
+            let pair_str = pair.iter().collect::<String>();
+
+            // Wenn das Paar mindestens ein weiteres Mal in `alle_paare` vorkommt, ist die Klausur gültig
+            if alle_paare.contains(&pair_str) {
+                hat_geteilte_paare = true;
+                break;
+            }
+        }
+
+        hat_geteilte_paare // Nur Klausuren mit geteilten Paaren bleiben erhalten
+    });
+
+    println!("Bereinigter klausuren-Vektor: {:?}", klausuren);
+    klausuren
+}
+
 pub fn update_hash_map(
     hash_map: &mut HashMap<char, u16>,
     kl_number: usize,
@@ -40,18 +72,21 @@ pub fn update_hash_map(
 }
 
 pub fn sorter(path: String) -> Vec<HashMap<char, u16>> {
-    let mut klausuren_vec_old: Vec<String> = sorter_util::get_klausur_lines_data(&path);
-    dbg!(&klausuren_vec_old);
-    for klausur in klausuren_vec_old.iter_mut() {
+    let mut klausuren_vec: Vec<String> = sorter_util::get_klausur_lines_data(&path);
+    dbg!(&klausuren_vec);
+    for klausur in klausuren_vec.iter_mut() {
         *klausur = klausur.replace(" < ", "");
     }
-    println!("klausurenvec :  {:?}", klausuren_vec_old);
-    let df = conflicts::make_df(klausuren_vec_old.clone());
-    let klausuren_vec: Vec<String> =
-        conflicts::locate_conflicts(df.clone(), klausuren_vec_old.clone());
+    println!("klausurenvec :  {:?}", klausuren_vec);
+    let df = conflicts::make_df(klausuren_vec.clone());
+    let mut klausuren_vec: Vec<String> =
+        conflicts::locate_conflicts(df.clone(), klausuren_vec.clone());
 
-    let mut hash_vec: Vec<HashMap<char, u16>> = vec![HashMap::new(); klausuren_vec_old.len()];
-    for (i, klausur) in klausuren_vec_old.iter().enumerate() {
+    klausuren_vec.dedup();
+    let klausuren_vec = klausurenvec_bereinigen(klausuren_vec);
+
+    let mut hash_vec: Vec<HashMap<char, u16>> = vec![HashMap::new(); klausuren_vec.len()];
+    for (i, klausur) in klausuren_vec.iter().enumerate() {
         for (j, char) in klausur.chars().enumerate() {
             hash_vec[i].insert(char, (j + 1) as u16);
         }
@@ -75,10 +110,10 @@ pub fn sorter(path: String) -> Vec<HashMap<char, u16>> {
                             changed = true;
                             // println!("Hasvec: {:#?}", hash_vec);
                             if val_i == max_val {
-                                update_hash_map(&mut hash_vec[j], j, &klausuren_vec_old, cchar);
+                                update_hash_map(&mut hash_vec[j], j, &klausuren_vec, cchar);
                                 println!("vali was maxval");
                             } else if val_j == max_val {
-                                update_hash_map(&mut hash_vec[i], i, &klausuren_vec_old, cchar);
+                                update_hash_map(&mut hash_vec[i], i, &klausuren_vec, cchar);
                                 println!("valj was maxval");
                             }
                         }
