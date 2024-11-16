@@ -4,7 +4,7 @@ use std::env;
 use std::io::{self, Write};
 
 #[allow(unused)]
-const DEFAULT_PATH: &str = "./data/schwierigkeiten0.txt";
+const DEFAULT_PATH: &str = "./data/schwierigkeiten3.txt";
 #[allow(unused)]
 const TEST_PATH: &str = "./data/test/test.txt";
 
@@ -20,7 +20,7 @@ fn main() {
         println!("No path provided, using default path: \ndata/schwierigkeiten0.txt");
         press_enter();
 
-        let default_path = TEST_PATH.parse().unwrap();
+        let default_path = DEFAULT_PATH.parse().unwrap();
         hashvec = sorter::sorter(default_path);
     }
     //let output = sorter::sortout(&mut hashvec);

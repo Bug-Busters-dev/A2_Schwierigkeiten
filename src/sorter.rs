@@ -40,17 +40,18 @@ pub fn update_hash_map(
 }
 
 pub fn sorter(path: String) -> Vec<HashMap<char, u16>> {
-    let mut klausuren_vec: Vec<String> = sorter_util::get_klausur_lines_data(&path);
-    dbg!(&klausuren_vec);
-    for klausur in klausuren_vec.iter_mut() {
+    let mut klausuren_vec_old: Vec<String> = sorter_util::get_klausur_lines_data(&path);
+    dbg!(&klausuren_vec_old);
+    for klausur in klausuren_vec_old.iter_mut() {
         *klausur = klausur.replace(" < ", "");
     }
-    println!("klausurenvec :  {:?}", klausuren_vec);
-    let df = conflicts::make_df(klausuren_vec.clone());
-    let klausuren_vec = conflicts::locate_conflicts(df, klausuren_vec.clone());
+    println!("klausurenvec :  {:?}", klausuren_vec_old);
+    let df = conflicts::make_df(klausuren_vec_old.clone());
+    let klausuren_vec: Vec<String> =
+        conflicts::locate_conflicts(df.clone(), klausuren_vec_old.clone());
 
-    let mut hash_vec: Vec<HashMap<char, u16>> = vec![HashMap::new(); klausuren_vec.len()];
-    for (i, klausur) in klausuren_vec.iter().enumerate() {
+    let mut hash_vec: Vec<HashMap<char, u16>> = vec![HashMap::new(); klausuren_vec_old.len()];
+    for (i, klausur) in klausuren_vec_old.iter().enumerate() {
         for (j, char) in klausur.chars().enumerate() {
             hash_vec[i].insert(char, (j + 1) as u16);
         }
@@ -74,10 +75,10 @@ pub fn sorter(path: String) -> Vec<HashMap<char, u16>> {
                             changed = true;
                             // println!("Hasvec: {:#?}", hash_vec);
                             if val_i == max_val {
-                                update_hash_map(&mut hash_vec[j], j, &klausuren_vec, cchar);
+                                update_hash_map(&mut hash_vec[j], j, &klausuren_vec_old, cchar);
                                 println!("vali was maxval");
                             } else if val_j == max_val {
-                                update_hash_map(&mut hash_vec[i], i, &klausuren_vec, cchar);
+                                update_hash_map(&mut hash_vec[i], i, &klausuren_vec_old, cchar);
                                 println!("valj was maxval");
                             }
                         }

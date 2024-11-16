@@ -54,12 +54,7 @@ fn get_conflicts(
             println!("-----------------");
 
             // Benutzer nach dem bevorzugten Paar fragen
-            println!(
-                "Bitte wählen Sie das bevorzugte Paar aus den folgenden Optionen: {:?}",
-                involved_chars
-            );
 
-            // Benutzereingabe einlesen
             let mut preferred_pair = String::new();
             io::stdin()
                 .read_line(&mut preferred_pair)
