@@ -36,7 +36,7 @@ fn get_conflicts(
     sorted_pairs: Vec<String>,
     char_pairs: Vec<Vec<String>>,
     klassenvec: &mut Vec<String>,
-) -> Result<Vec<String>, Vec<String>> {
+) -> Vec<String> {
     // Überprüfe jede Gruppe in `sorted_pairs` mit den entsprechenden `char_pairs`
     let mut konflikt = false;
 
@@ -162,10 +162,7 @@ fn get_conflicts(
             }
         }
     }
-    match konflikt {
-        true => Err(klassenvec.clone()),
-        false => Ok(klassenvec.clone()),
-    }
+    return klassenvec.clone();
 }
 
 pub fn make_df(klassenvec: Vec<String>) -> DataFrame {
@@ -234,10 +231,7 @@ pub fn make_df(klassenvec: Vec<String>) -> DataFrame {
     df_pairs
 }
 
-pub fn locate_conflicts(
-    _dataframe: DataFrame,
-    klassenvec: Vec<String>,
-) -> Result<Vec<String>, Vec<String>> {
+pub fn locate_conflicts(_dataframe: DataFrame, klassenvec: Vec<String>) -> Vec<String> {
     let df = make_df(klassenvec.clone());
 
     let dublicates = df
@@ -269,11 +263,7 @@ pub fn locate_conflicts(
             .collect();
         char_pairs.push(char_pair1);
     }
-    let mut klassenvec = klassenvec.clone();
-    match get_conflicts(sorted_pairs, char_pairs, &mut klassenvec) {
-        Ok(klassenvec) => Ok(klassenvec),
-        Err(klassenvec) => Err(klassenvec),
-    }
+    return get_conflicts(sorted_pairs, char_pairs, &mut klassenvec.clone());
 }
 
 #[cfg(test)]

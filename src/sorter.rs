@@ -71,27 +71,9 @@ pub fn sorter(path: String) -> Vec<HashMap<char, u16>> {
         *klausur = klausur.replace(" < ", "");
     }
 
-    let mut changed: bool = true;
-    while changed {
-        changed = false;
-        let df = conflicts::make_df(klausuren_vec.clone());
-        let mut klausuren_vec_result: Result<Vec<String>, Vec<String>> =
-            conflicts::locate_conflicts(df.clone(), klausuren_vec.clone());
-        match klausuren_vec_result {
-            Ok(klausuren) => {
-                klausuren_vec_result = Ok(klausuren);
-            }
-            Err(klausuren) => {
-                klausuren_vec_result = Err(klausuren);
-            }
-        }
-        if klausuren_vec_result.is_ok() {
-            klausuren_vec = klausuren_vec_result.unwrap();
-            break;
-        } else {
-            changed = true;
-        }
-    }
+    let df = conflicts::make_df(klausuren_vec.clone());
+    let mut klausuren_vec: Vec<String> =
+        conflicts::locate_conflicts(df.clone(), klausuren_vec.clone());
     klausuren_vec.dedup();
     for klausur in klausuren_vec.iter_mut() {
         *klausur = klausur.chars().dedup().collect::<String>();
