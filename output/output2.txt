@@ -1,0 +1,50 @@
+Nicht perfekt richtig, da fgh nicht eindeutig zugeordnet werden können. deswegen wird A mit F gleichs´gesetz und B mit G
+
+Path provided: 
+/home/benni/programming/BWINF/2024/runde1/schwierigkeiten/data/schwierigkeiten2.txt
+Fehler: Uneinheitliche Paare in Gruppe AC: Involvierte Paare: ["AC", "CA"]
+Jetztige daten:
+-----------------
+ A  B  C 
+ E  C  D 
+ E  C  A 
+ E  F  G  H 
+ H  F 
+ D  E 
+-----------------
+Du kannst ein buchstabe löschen (1 eintippen), oder die anordnung der buchstaben ändern (2 eintippen)
+2
+Bitte gebe deine Gewünschte reihenfolge ein
+AC
+Der aktualisierte klausuren-Vektor ist: ["ABC", "ECD", "EAC", "EFGH", "HF", "DE"]
+Fehler: Uneinheitliche Paare in Gruppe FH: Involvierte Paare: ["FH", "HF"]
+Jetztige daten:
+-----------------
+ A  B  C 
+ E  C  D 
+ E  A  C 
+ E  F  G  H 
+ H  F 
+ D  E 
+-----------------
+Du kannst ein buchstabe löschen (1 eintippen), oder die anordnung der buchstaben ändern (2 eintippen)
+2
+Bitte gebe deine Gewünschte reihenfolge ein
+FH
+Der aktualisierte klausuren-Vektor ist: ["ABC", "ECD", "EAC", "EFGH", "FH", "DE"]
+Fehler: Uneinheitliche Paare in Gruppe DE: Involvierte Paare: ["DE", "ED"]
+Jetztige daten:
+-----------------
+ A  B  C 
+ E  C  D 
+ E  A  C 
+ E  F  G  H 
+ F  H 
+ D  E 
+-----------------
+Du kannst ein buchstabe löschen (1 eintippen), oder die anordnung der buchstaben ändern (2 eintippen)
+2
+Bitte gebe deine Gewünschte reihenfolge ein
+ED
+Der aktualisierte klausuren-Vektor ist: ["ABC", "ECD", "EAC", "EFGH", "FH", "ED"]
+"E AF BG  D"

@@ -1,0 +1,16 @@
+Path provided: 
+/home/benni/programming/BWINF/2024/runde1/schwierigkeiten/data/schwierigkeiten0.txt
+Fehler: Uneinheitliche Paare in Gruppe FG: Involvierte Paare: ["FG", "GF"]
+Jetztige daten:
+-----------------
+ B  A  D  F 
+ D  F  G 
+ A  E  D  C 
+ G  F  C 
+-----------------
+Du kannst ein buchstabe löschen (1 eintippen), oder die anordnung der buchstaben ändern (2 eintippen)
+2
+Bitte gebe deine Gewünschte reihenfolge ein
+GF
+Der aktualisierte klausuren-Vektor ist: ["BADF", "DGF", "AEDC", "GFC"]
+"B  E D  F C"

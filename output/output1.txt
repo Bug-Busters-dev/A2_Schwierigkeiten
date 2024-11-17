@@ -1,0 +1,3 @@
+Path provided: 
+/home/benni/programming/BWINF/2024/runde1/schwierigkeiten/data/schwierigkeiten1.txt
+"A  CG F D"

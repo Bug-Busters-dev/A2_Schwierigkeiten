@@ -5,38 +5,41 @@ use std::env;
 use std::io;
 use std::vec;
 
-fn replace_pairs(klausur: &str, pair1: &str, pair2: &str) -> String {
-    let mut result = klausur.to_string();
-    let first_char_p2 = pair2.chars().nth(0).unwrap();
-    let second_char_p2 = pair2.chars().nth(1).unwrap();
+fn replace_pairs(line: &str, pair1: &str, pair2: &str) -> String {
+    let mut result = String::new();
+    let mut chars = line.chars().peekable();
 
-    let first_char_p1 = pair1.chars().nth(0).unwrap();
-    let second_char_p1 = pair1.chars().nth(1).unwrap();
+    // Suchen nach den Paaren in der richtigen Reihenfolge
+    while let Some(c) = chars.next() {
+        let mut potential_match = String::new();
+        potential_match.push(c);
 
-    // wenn first_char_p1 und second_char_p1 in klausur sind (in richtiger Reihenfolge)
-    // nutze iter um zu überprüfen ob die chars in der richtigen Reihenfolge sind
-    if klausur.chars().position(|c| c == first_char_p2)
-        > klausur.chars().position(|c| c == second_char_p2)
-    {
-        // wenn pair1 in klausur ist
-        // only replace first occurence
-        result = result.replacen(first_char_p2, &second_char_p2.to_string(), 1);
-        // only replace second occurence of the char (nn would replace 2. n)
-        result = result.replacen(first_char_p1, &second_char_p1.to_string(), 1);
-
-        // Check if first_char_p1 and second_char_p1 are in `klausur` in the correct order
+        // Wenn wir ein Zeichen haben, das Teil des Paars ist, suchen wir nach dem zweiten
+        if potential_match == pair1.get(0..1).unwrap() {
+            if let Some(next_char) = chars.peek() {
+                potential_match.push(*next_char);
+                if potential_match == pair1 {
+                    // Wir haben das Paar gefunden und ersetzen es
+                    result.push_str(pair2);
+                    chars.next(); // Das zweite Zeichen des Paars überspringen
+                    continue;
+                }
+            }
+        }
+        // Wenn kein Paar gefunden wurde, das Zeichen beibehalten
+        result.push(c);
     }
     result
-
-    // pair 2 ist das erwünschte pair
 }
 
 fn get_conflicts(
     sorted_pairs: Vec<String>,
     char_pairs: Vec<Vec<String>>,
     klassenvec: &mut Vec<String>,
-) -> Vec<String> {
+) -> Result<Vec<String>, Vec<String>> {
     // Überprüfe jede Gruppe in `sorted_pairs` mit den entsprechenden `char_pairs`
+    let mut konflikt = false;
+
     for (i, sorted_pair) in sorted_pairs.iter().enumerate() {
         if i >= char_pairs.len() {
             println!("Fehler: Keine Daten in `char_pairs` für {}", sorted_pair);
@@ -51,16 +54,12 @@ fn get_conflicts(
         involved_chars.dedup(); // Entfernt Duplikate, sodass jedes involvierte Paar nur einmal vorkommt
 
         // Überprüfe, ob alle Paare gleich sind
-        if involved_chars.len() == 1 {
-            println!(
-                "Alle Paare in Gruppe {} sind identisch: {:?}",
-                sorted_pair, current_pairs
-            );
-        } else {
+        if involved_chars.len() != 1 {
             println!(
                 "Fehler: Uneinheitliche Paare in Gruppe {}: Involvierte Paare: {:?}",
                 sorted_pair, involved_chars
             );
+            konflikt = true;
             // print the current data with < between chars
             println!("Jetztige daten:");
             println!("-----------------");
@@ -129,13 +128,9 @@ fn get_conflicts(
 
                     // `klausuren`-Vektor aktualisieren, indem alle involvierten Paare auf das bevorzugte Paar gesetzt werden
                     for entry in klassenvec.iter_mut() {
-                        println!("Vorherige Klausur: {}", entry);
                         for pair in &involved_chars {
-                            *entry =
-                                replace_pairs(entry, pair.as_str(), dbg!(&preferred_pair.trim()));
+                            *entry = replace_pairs(entry, pair.as_str(), &preferred_pair.trim());
                         }
-                        println!("Aktualisierte Klausur: {}", entry);
-                        println!("----------------------------")
                     }
 
                     println!("Der aktualisierte klausuren-Vektor ist: {:?}", klassenvec);
@@ -167,7 +162,10 @@ fn get_conflicts(
             }
         }
     }
-    return klassenvec.to_owned();
+    match konflikt {
+        true => Err(klassenvec.clone()),
+        false => Ok(klassenvec.clone()),
+    }
 }
 
 pub fn make_df(klassenvec: Vec<String>) -> DataFrame {
@@ -236,7 +234,10 @@ pub fn make_df(klassenvec: Vec<String>) -> DataFrame {
     df_pairs
 }
 
-pub fn locate_conflicts(_dataframe: DataFrame, klassenvec: Vec<String>) -> Vec<String> {
+pub fn locate_conflicts(
+    _dataframe: DataFrame,
+    klassenvec: Vec<String>,
+) -> Result<Vec<String>, Vec<String>> {
     let df = make_df(klassenvec.clone());
 
     let dublicates = df
@@ -268,7 +269,11 @@ pub fn locate_conflicts(_dataframe: DataFrame, klassenvec: Vec<String>) -> Vec<S
             .collect();
         char_pairs.push(char_pair1);
     }
-    return get_conflicts(sorted_pairs, char_pairs, &mut klassenvec.clone());
+    let mut klassenvec = klassenvec.clone();
+    match get_conflicts(sorted_pairs, char_pairs, &mut klassenvec) {
+        Ok(klassenvec) => Ok(klassenvec),
+        Err(klassenvec) => Err(klassenvec),
+    }
 }
 
 #[cfg(test)]
@@ -281,7 +286,7 @@ fn main() {
         "BFA".to_string(),
     ];
     let df = make_df(klassenvec.clone());
-    locate_conflicts(df, klassenvec);
+    let _ = locate_conflicts(df, klassenvec);
 }
 #[test]
 fn neu2() {
@@ -304,23 +309,28 @@ fn neu2() {
         "PFKOXW".to_string(),
     ];
     let df = make_df(klassenvec.clone());
-    locate_conflicts(df, klassenvec);
+    let _ = locate_conflicts(df, klassenvec);
 }
 #[test]
 fn neu3() {
     let klassenvec = vec![
-        "HSCGA".to_string(),
-        "SOJLF".to_string(),
-        "MODXU".to_string(),
-        "SCENM".to_string(),
-        "EMFXB".to_string(),
-        "DGPXA".to_string(),
-        "RLXUT".to_string(),
-        "MOFVD".to_string(),
-        "SOUTP".to_string(),
-        "ZQKXI".to_string(),
-        "BWIY".to_string(),
+        "ABCDEIJ".to_string(),
+        "BCDEHIK".to_string(),
+        "GSHIJ".to_string(),
+        "GSHO".to_string(),
+        "MNKO".to_string(),
+        "KMO".to_string(),
+        "PQRFMN".to_string(),
+        "SFPNK".to_string(),
+        "FTU".to_string(),
+        "WVZT".to_string(),
+        "ZYXT".to_string(),
+        "WZTTVU".to_string(),
+        "KWZY".to_string(),
+        "ABDEWZXYU".to_string(),
+        "QRKL".to_string(),
+        "FPKOWX".to_string(),
     ];
     let df = make_df(klassenvec.clone());
-    locate_conflicts(df, klassenvec);
+    let _ = locate_conflicts(df, klassenvec);
 }

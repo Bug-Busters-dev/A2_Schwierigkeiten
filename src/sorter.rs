@@ -3,8 +3,10 @@ use std::{
     collections::{HashMap, HashSet},
 };
 
+use itertools::Itertools;
+
 use crate::{
-    conflicts,
+    conflicts::{self},
     sorter_util::{self},
 };
 
@@ -68,11 +70,34 @@ pub fn sorter(path: String) -> Vec<HashMap<char, u16>> {
     for klausur in klausuren_vec.iter_mut() {
         *klausur = klausur.replace(" < ", "");
     }
-    let df = conflicts::make_df(klausuren_vec.clone());
-    let mut klausuren_vec: Vec<String> =
-        conflicts::locate_conflicts(df.clone(), klausuren_vec.clone());
 
+    let mut changed: bool = true;
+    while changed {
+        changed = false;
+        let df = conflicts::make_df(klausuren_vec.clone());
+        let mut klausuren_vec_result: Result<Vec<String>, Vec<String>> =
+            conflicts::locate_conflicts(df.clone(), klausuren_vec.clone());
+        match klausuren_vec_result {
+            Ok(klausuren) => {
+                klausuren_vec_result = Ok(klausuren);
+            }
+            Err(klausuren) => {
+                klausuren_vec_result = Err(klausuren);
+            }
+        }
+        if klausuren_vec_result.is_ok() {
+            klausuren_vec = klausuren_vec_result.unwrap();
+            break;
+        } else {
+            changed = true;
+        }
+    }
     klausuren_vec.dedup();
+    for klausur in klausuren_vec.iter_mut() {
+        *klausur = klausur.chars().dedup().collect::<String>();
+    }
+    println!("{:?}", klausuren_vec);
+
     let klausuren_vec = klausurenvec_bereinigen(klausuren_vec);
 
     let mut hash_vec: Vec<HashMap<char, u16>> = vec![HashMap::new(); klausuren_vec.len()];
