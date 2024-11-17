@@ -18,18 +18,11 @@ fn replace_pairs(klausur: &str, pair1: &str, pair2: &str) -> String {
     if klausur.chars().position(|c| c == first_char_p2)
         > klausur.chars().position(|c| c == second_char_p2)
     {
-        println!("OK");
         // wenn pair1 in klausur ist
-        println!("first_char_p1: {}", first_char_p1);
-        println!("second_char_p1: {}", second_char_p1);
-        println!("first_char_p2: {}", first_char_p2);
-        println!("second_char_p2: {}", second_char_p2);
         // only replace first occurence
         result = result.replacen(first_char_p2, &second_char_p2.to_string(), 1);
-        println!("Result1: {}", result);
         // only replace second occurence of the char (nn would replace 2. n)
         result = result.replacen(first_char_p1, &second_char_p1.to_string(), 1);
-        println!("Result2: {}", result);
 
         // Check if first_char_p1 and second_char_p1 are in `klausur` in the correct order
     }
@@ -107,6 +100,7 @@ fn get_conflicts(
                 // Benutzer nach dem bevorzugten Paar fragen
                 if change_type == 2 {
                     let mut preferred_pair = String::new();
+                    println!("Bitte gebe deine Gewünschte reihenfolge ein");
                     io::stdin()
                         .read_line(&mut preferred_pair)
                         .expect("Fehler beim Lesen der Eingabe");
@@ -238,7 +232,7 @@ pub fn make_df(klassenvec: Vec<String>) -> DataFrame {
         klausur_series.into_column(),
     ])
     .unwrap();
-    println!("{:?}", df_pairs);
+
     df_pairs
 }
 
@@ -257,27 +251,6 @@ pub fn locate_conflicts(_dataframe: DataFrame, klassenvec: Vec<String>) -> Vec<S
         .collect()
         .unwrap();
 
-    println!("{:?}", dublicates);
-    // make dublicates to strings.
-    /* let chars_pairs_series = dublicates
-        .get_columns()
-        .iter()
-        .nth(0)
-        .unwrap()
-        .as_series()
-        .unwrap()
-        .to_owned();
-    let strings: Vec<String> = chars_pairs_series
-        .str()
-        .unwrap()
-        .into_iter()
-        .filter_map(|opt_str| opt_str.map(|s| s.to_string()))
-        .collect();
-    */
-    /*
-        for every dublicate we wanna see if the char_series is in the same reinfolge wenn nt dann conflict und user warnen
-    */
-
     // loop over SortedPairs column and look in CharPairs column in dubliactes
     let mut sorted_pairs: Vec<String> = Vec::new();
     let mut char_pairs: Vec<Vec<String>> = Vec::new();
@@ -285,7 +258,6 @@ pub fn locate_conflicts(_dataframe: DataFrame, klassenvec: Vec<String>) -> Vec<S
         let sorted_pair = sorted_pair.unwrap();
         sorted_pairs.push(sorted_pair.to_string());
     }
-    println!("{:?}", char_pairs);
     for char_pair1 in dublicates.column("CharPairs").unwrap().list().unwrap() {
         let char_pair1 = char_pair1.unwrap();
         let char_pair1: Vec<String> = char_pair1

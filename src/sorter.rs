@@ -36,7 +36,6 @@ fn klausurenvec_bereinigen(mut klausuren: Vec<String>) -> Vec<String> {
         hat_geteilte_paare // Nur Klausuren mit geteilten Paaren bleiben erhalten
     });
 
-    println!("Bereinigter klausuren-Vektor: {:?}", klausuren);
     klausuren
 }
 
@@ -46,38 +45,29 @@ pub fn update_hash_map(
     kl_vec: &Vec<String>,
     cchar: char,
 ) -> () {
-    dbg!(&hash_map);
-    println!("-----------------------------------------------");
-    println!("found: {}", cchar);
     let mut var_plus: u16 = 1;
     let mut chars_iter = kl_vec[kl_number].chars();
     let mut val: u16;
 
-    println!("chars iter before: {chars_iter:?}");
     'char: while let Some(c) = chars_iter.next() {
         if c == cchar {
             break 'char;
         }
     }
-    println!("chars iter  after: {chars_iter:?}");
 
     for x in chars_iter {
-        val = dbg!(hash_map.get(&cchar).unwrap().clone());
-        val += dbg!(var_plus);
+        val = hash_map.get(&cchar).unwrap().clone();
+        val += var_plus;
         var_plus += 1;
         hash_map.entry(x).and_modify(|v| *v = val);
-        println!("modified: {}, to be {}", x, val);
     }
-    println!("-----------------------------------------------");
 }
 
 pub fn sorter(path: String) -> Vec<HashMap<char, u16>> {
     let mut klausuren_vec: Vec<String> = sorter_util::get_klausur_lines_data(&path);
-    dbg!(&klausuren_vec);
     for klausur in klausuren_vec.iter_mut() {
         *klausur = klausur.replace(" < ", "");
     }
-    println!("klausurenvec :  {:?}", klausuren_vec);
     let df = conflicts::make_df(klausuren_vec.clone());
     let mut klausuren_vec: Vec<String> =
         conflicts::locate_conflicts(df.clone(), klausuren_vec.clone());
@@ -92,8 +82,6 @@ pub fn sorter(path: String) -> Vec<HashMap<char, u16>> {
         }
     }
 
-    println!("before: {:?}", hash_vec);
-
     let mut changed: bool = true;
     while changed {
         changed = false;
@@ -101,20 +89,15 @@ pub fn sorter(path: String) -> Vec<HashMap<char, u16>> {
             for j in 0..hash_vec.len() {
                 for (&cchar, &val_i) in hash_vec[i].clone().iter() {
                     if let Some(&val_j) = hash_vec[j].get(&cchar) {
-                        // println!("{:#?}", hash_vec);
-
                         if val_i != val_j {
                             let max_val: u16 = max(val_i, val_j);
                             hash_vec[i].insert(cchar, max_val);
                             hash_vec[j].insert(cchar, max_val);
                             changed = true;
-                            // println!("Hasvec: {:#?}", hash_vec);
                             if val_i == max_val {
                                 update_hash_map(&mut hash_vec[j], j, &klausuren_vec, cchar);
-                                println!("vali was maxval");
                             } else if val_j == max_val {
                                 update_hash_map(&mut hash_vec[i], i, &klausuren_vec, cchar);
-                                println!("valj was maxval");
                             }
                         }
                     }
